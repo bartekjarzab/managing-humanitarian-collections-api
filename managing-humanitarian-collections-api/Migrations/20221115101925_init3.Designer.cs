@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221115101925_init3")]
+    partial class init3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,8 +119,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CollectionId");
 
                     b.ToTable("CollectionPoints");
                 });
@@ -351,15 +351,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>
-                {
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Collection", null)
-                        .WithMany("Points")
-                        .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionProduct", b =>
                 {
                     b.HasOne("managing_humanitarian_collections_api.Entities.Collection", "Collection")
@@ -434,11 +425,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Collection", b =>
-                {
-                    b.Navigation("Points");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>

@@ -8,7 +8,7 @@
 
         public int DonatorId { get; set; }
         public int CollectionProductId { get; set; }
-        public virtual Donator Donator { get; set; }
+       // public virtual Donator Donator { get; set; }
         public virtual CollectionProduct CollectionProduct { get; set; }
     }
 }

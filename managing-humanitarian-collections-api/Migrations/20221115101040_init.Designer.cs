@@ -10,7 +10,7 @@ using managing_humanitarian_collections_api.Entities;
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    [Migration("20221112113755_init")]
+    [Migration("20221115101040_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,34 +79,16 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("CollectionPointId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OrganizerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("RegistrationNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CollectionPointId");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasIndex("OrganizerId");
 
                     b.ToTable("Collections");
                 });
@@ -118,10 +100,16 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("ClosingHour")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CollectionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OpeningHour")
@@ -174,23 +162,6 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Donator", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Donators");
-                });
-
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -214,33 +185,7 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.HasIndex("CollectionProductId");
 
-                    b.HasIndex("DonatorId");
-
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Organizer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<int>("ContactNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Nip")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Regon")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Organizers");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
@@ -261,8 +206,7 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductCategoryId")
-                        .IsUnique();
+                    b.HasIndex("ProductCategoryId");
 
                     b.HasIndex("ProductPropertiesId");
 
@@ -275,6 +219,9 @@ namespace managing_humanitarian_collections_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -297,6 +244,9 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<int>("Height")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Size")
                         .HasColumnType("nvarchar(max)");
 
@@ -308,6 +258,8 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProductId");
+
                     b.ToTable("ProductPropertiess");
                 });
 
@@ -318,17 +270,11 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("AvatarId")
+                    b.Property<int?>("AvatarId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ContactNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountOfDeliveries")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DonatorId")
-                        .HasColumnType("int");
+                    b.Property<string>("ContactNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Firstname")
                         .HasColumnType("nvarchar(max)");
@@ -336,13 +282,39 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<string>("Lastname")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Nip")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Regon")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AvatarId");
 
-                    b.HasIndex("DonatorId");
-
                     b.ToTable("Profiles");
+                });
+
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.User", b =>
@@ -353,56 +325,27 @@ namespace managing_humanitarian_collections_api.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HashPassword")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isOrganizer")
-                        .HasColumnType("bit");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Collection", b =>
-                {
-                    b.HasOne("managing_humanitarian_collections_api.Entities.CollectionPoint", "CollectionPoint")
-                        .WithMany()
-                        .HasForeignKey("CollectionPointId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Comment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Organizer", "Organizer")
-                        .WithMany()
-                        .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CollectionPoint");
-
-                    b.Navigation("Comment");
-
-                    b.Navigation("Organizer");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>
                 {
                     b.HasOne("managing_humanitarian_collections_api.Entities.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AddressId");
 
                     b.Navigation("Address");
                 });
@@ -426,17 +369,6 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Donator", b =>
-                {
-                    b.HasOne("managing_humanitarian_collections_api.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Order", b =>
                 {
                     b.HasOne("managing_humanitarian_collections_api.Entities.CollectionProduct", "CollectionProduct")
@@ -445,22 +377,14 @@ namespace managing_humanitarian_collections_api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Donator", "Donator")
-                        .WithMany()
-                        .HasForeignKey("DonatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("CollectionProduct");
-
-                    b.Navigation("Donator");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
                 {
                     b.HasOne("managing_humanitarian_collections_api.Entities.ProductCategory", "ProductCategory")
-                        .WithOne("Products")
-                        .HasForeignKey("managing_humanitarian_collections_api.Entities.Product", "ProductCategoryId")
+                        .WithMany()
+                        .HasForeignKey("ProductCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -475,28 +399,36 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Navigation("ProductProperties");
                 });
 
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.ProductProperties", b =>
+                {
+                    b.HasOne("managing_humanitarian_collections_api.Entities.Product", null)
+                        .WithMany("Properties")
+                        .HasForeignKey("ProductId");
+                });
+
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Profile", b =>
                 {
                     b.HasOne("managing_humanitarian_collections_api.Entities.Avatar", "Avatar")
                         .WithMany()
-                        .HasForeignKey("AvatarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Donator", "Donator")
-                        .WithMany()
-                        .HasForeignKey("DonatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AvatarId");
 
                     b.Navigation("Avatar");
-
-                    b.Navigation("Donator");
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.ProductCategory", b =>
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.User", b =>
                 {
-                    b.Navigation("Products");
+                    b.HasOne("managing_humanitarian_collections_api.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
+                {
+                    b.Navigation("Properties");
                 });
 #pragma warning restore 612, 618
         }

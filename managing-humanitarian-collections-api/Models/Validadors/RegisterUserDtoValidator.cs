@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using managing_humanitarian_collections_api.Entities;
+using managing_humanitarian_collections_api.Models.UserModels;
 using System.Linq;
 
 namespace managing_humanitarian_collections_api.Models.Validadors

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221115115602_init6")]
+    partial class init6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -353,11 +355,13 @@ namespace managing_humanitarian_collections_api.Migrations
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>
                 {
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Collection", null)
-                        .WithMany("Points")
+                    b.HasOne("managing_humanitarian_collections_api.Entities.Collection", "Collection")
+                        .WithMany("CollectionPoints")
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Collection");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionProduct", b =>
@@ -438,7 +442,7 @@ namespace managing_humanitarian_collections_api.Migrations
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Collection", b =>
                 {
-                    b.Navigation("Points");
+                    b.Navigation("CollectionPoints");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>

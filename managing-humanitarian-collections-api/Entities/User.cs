@@ -5,6 +5,9 @@
         public int Id { get; set; }
         public string Email { get; set; }
         public string HashPassword { get; set; }
-        public bool isOrganizer { get; set; }
+     //   public bool isOrganizer { get; set; }
+        public int RoleId { get; set; }
+        public virtual Role Role { get; set; }
+     
     }
 }

@@ -1,5 +1,4 @@
-﻿using managing_humanitarian_collections_api.Models;
-using managing_humanitarian_collections_api.Entities;
+﻿using managing_humanitarian_collections_api.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System.Collections.Generic;
@@ -8,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.EntityFrameworkCore;
+using managing_humanitarian_collections_api.Models.UserModels;
 
 namespace managing_humanitarian_collections_api.Services
 {
@@ -33,7 +34,7 @@ namespace managing_humanitarian_collections_api.Services
             var newUser = new User()
             {
                 Email = dto.Email,
-                isOrganizer = dto.isOrganizer
+                RoleId = dto.RoleId
             };
             var hashedPassword = _passwordHasher.HashPassword(newUser, dto.Password);
 
@@ -44,7 +45,9 @@ namespace managing_humanitarian_collections_api.Services
         }
         public string GenerateJwt(LoginDto dto)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == dto.Email);
+            var user = _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.Email == dto.Email);
 
             var result = _passwordHasher.VerifyHashedPassword(user, user.HashPassword, dto.Password);
             if (result == PasswordVerificationResult.Failed) return "Nothing";
@@ -53,7 +56,7 @@ namespace managing_humanitarian_collections_api.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, $"{user.Email}"),
-                new Claim(ClaimTypes.Role, $"{user.isOrganizer}"),
+                new Claim(ClaimTypes.Role, $"{user.Role.Name}"),
 
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));

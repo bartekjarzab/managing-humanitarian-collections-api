@@ -1,4 +1,4 @@
-﻿namespace managing_humanitarian_collections_api.Models
+﻿namespace managing_humanitarian_collections_api.Models.UserModels
 {
     public class LoginDto
     {
