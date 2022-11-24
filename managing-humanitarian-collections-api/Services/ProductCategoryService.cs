@@ -30,7 +30,7 @@ namespace managing_humanitarian_collections_api.Services
         public int Create(CreateProductCategoryDto dto)
         {
             var productcategory = _mapper.Map<ProductCategory>(dto);
-            productcategory.CreatedById = _userContextService.GetUserId;
+           // productcategory.CreatedById = _userContextService.GetUserId;
             _dbContext.ProductCategories.Add(productcategory);
             _dbContext.SaveChanges();
 

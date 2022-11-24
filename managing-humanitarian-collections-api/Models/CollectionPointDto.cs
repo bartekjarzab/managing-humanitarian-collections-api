@@ -13,6 +13,6 @@ namespace managing_humanitarian_collections_api.Models
         public string Postcode { get; set; }
         public string HouseNumber { get; set; }
         public string Apartment { get; set; }
-        //   public virtual AddressDto Address { get; set; }
+        //public AddressDto Address { get; set; }
     } 
 }

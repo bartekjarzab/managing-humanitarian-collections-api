@@ -11,7 +11,8 @@ namespace managing_humanitarian_collections_api.Services
 
     public interface IProductService
     {
-        
+        CollectionProductsNeededDto GetById(int id);
+        List<CategoriesDto> GetProductsByCategory(string name);
     }
     public class ProductService : IProductService
     {
@@ -22,6 +23,42 @@ namespace managing_humanitarian_collections_api.Services
             _dbContext = dbContext;
             _mapper = mapper;
         }
-        
+
+        public CollectionProductsNeededDto GetById(int id)
+        {
+            var collection = _dbContext.Collections
+                .Include(n => n.CollectionProducts)
+                .ThenInclude(n => n.Product)
+                .FirstOrDefault(r => r.Id == id);
+
+            // if(collection is null) exception
+
+            var result = _mapper.Map<CollectionProductsNeededDto>(collection);
+            return result;
+        }
+
+        public List<CategoriesDto> GetProductsByCategory(string name)
+        {
+            var categories = _dbContext.ProductCategories
+                .Include(c => c.Products)
+                .ToList();
+
+            var productsByCategoryDtos = _mapper.Map<List<CategoriesDto>>(categories);
+
+            return productsByCategoryDtos;
+        }
+
+        //    public List<CollectionPointDto> GetAll(int collectionId)
+        //{
+        //    var collection = _dbContext
+        //        .Collections
+        //        .Include(a => a.CollectionPoints)
+        //        .FirstOrDefault(r => r.Id == collectionId);
+
+        //    var collectionPointDtos = _mapper.Map<List<CollectionPointDto>>(collection.CollectionPoints);
+
+        //    return collectionPointDtos;
+        //}
+
     }
 }

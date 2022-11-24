@@ -56,8 +56,9 @@ namespace managing_humanitarian_collections_api.Services
             var collection = _dbContext
                 .Collections
                 .Include(r => r.CollectionPoints)
+                .ThenInclude(r =>r.Address)
                 .FirstOrDefault(r => r.Id == collectionId);
-
+            
             return collection;
         }
 

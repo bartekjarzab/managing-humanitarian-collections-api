@@ -6,11 +6,13 @@ namespace managing_humanitarian_collections_api.Entities
     public class Collection
     {
         public int Id { get; set; }
+        public string Name { get; set; }
         public string RegistrationNumber { get; set; }
         public string Title { get; set; }
         public string Status { get; set; }
 
         public virtual List<CollectionPoint> CollectionPoints { get; set; }
+        public virtual List<CollectionProduct> CollectionProducts { get; set; }
 
       //  public virtual List<CollectionPoint> Points { get; set; }
 

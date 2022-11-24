@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221124102245_init10")]
+    partial class init10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,7 +138,7 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<int>("CollectionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantily")
@@ -202,12 +204,7 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductCategoryId");
 
                     b.ToTable("Products");
                 });
@@ -222,10 +219,16 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
 
                     b.ToTable("ProductCategories");
                 });
@@ -366,7 +369,9 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.HasOne("managing_humanitarian_collections_api.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
                 });
@@ -382,15 +387,13 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Navigation("CollectionProduct");
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.ProductCategory", b =>
                 {
-                    b.HasOne("managing_humanitarian_collections_api.Entities.ProductCategory", "ProductCategory")
-                        .WithMany()
-                        .HasForeignKey("ProductCategoryId")
+                    b.HasOne("managing_humanitarian_collections_api.Entities.Product", null)
+                        .WithOne("ProductCategory")
+                        .HasForeignKey("managing_humanitarian_collections_api.Entities.ProductCategory", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ProductCategory");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.ProductProperties", b =>
@@ -436,6 +439,8 @@ namespace managing_humanitarian_collections_api.Migrations
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
                 {
+                    b.Navigation("ProductCategory");
+
                     b.Navigation("Properties");
                 });
 #pragma warning restore 612, 618

@@ -8,7 +8,7 @@
         public string ClosingHour { get; set; }
         public int CollectionId { get; set; }
      //   public int AddressId { get; set; }
-        public virtual Address Address { get; set; }
+        public Address Address { get; set; }
        // public virtual Collection Collection { get; set; }
     }
 }

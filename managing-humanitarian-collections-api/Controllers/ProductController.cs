@@ -12,7 +12,7 @@ namespace managing_humanitarian_collections_api.Controllers
 {
 
 
-    [Route("api/products")]
+    [Route("api/collection")]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -20,6 +20,21 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             _productService = productService;
         }
+    
+            [HttpGet("{id}/products")]
+            public ActionResult<CollectionProductsNeededDto> Get([FromRoute] int id)
+            {
+                var collection = _productService.GetById(id);
+                return Ok(collection);
+            }
+        [HttpGet("products/{name}")]
+        public ActionResult<CategoriesDto> GetProductsByCategory([FromRoute] string name)
+        {
+            var category = _productService.GetProductsByCategory(name);
+            return Ok(category);
+        }
+
+
     }
 }
 

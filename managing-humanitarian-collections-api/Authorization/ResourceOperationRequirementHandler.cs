@@ -15,11 +15,11 @@ namespace managing_humanitarian_collections_api.Authorization
                 context.Succeed(requirement);
             }
 
-            var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            if (productCategory.CreatedById == int.Parse(userId))
-            {
-                context.Succeed(requirement);
-            }
+            //var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            //if (productCategory.CreatedById == int.Parse(userId))
+            //{
+            //    context.Succeed(requirement);
+            //}
 
             return Task.CompletedTask;
         }

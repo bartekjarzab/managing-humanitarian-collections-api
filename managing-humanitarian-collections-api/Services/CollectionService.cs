@@ -11,8 +11,8 @@ namespace managing_humanitarian_collections_api.Services
     public interface ICollectionService
     {
         int Create(CreateCollectionDto dto);
-        CollectionDto GetById(int id);
-        IEnumerable<CollectionDto> GetAll();
+        CollectionWithAddressDto GetById(int id);
+        IEnumerable<CollectionWithAddressDto> GetAll();
        
         List<int> GetCollectionPointIds(int collectionId);
     }
@@ -35,28 +35,29 @@ namespace managing_humanitarian_collections_api.Services
 
             return collection.Id;
         }
-        public IEnumerable<CollectionDto> GetAll()
+        public IEnumerable<CollectionWithAddressDto> GetAll()
         {
             var collections = _dbContext
                 .Collections
                 .Include(r => r.CollectionPoints)
+                .ThenInclude(n => n.Address)
                 .ToList();
 
-            var collectionDtos = _mapper.Map<List<CollectionDto>>(collections);
+            var collectionDtos = _mapper.Map<List<CollectionWithAddressDto>>(collections);
 
             return collectionDtos;
         }
 
-        public CollectionDto GetById(int id)
+        public CollectionWithAddressDto GetById(int id)
         {
-            var collection = _dbContext
-                .Collections
+            var collection = _dbContext.Collections
                 .Include(n => n.CollectionPoints)
+                .ThenInclude(n => n.Address)
                 .FirstOrDefault(r => r.Id == id);
 
             // if(collection is null) exception
 
-            var result = _mapper.Map<CollectionDto>(collection);
+            var result = _mapper.Map<CollectionWithAddressDto>(collection);
             return result;
         }
 
@@ -76,6 +77,7 @@ namespace managing_humanitarian_collections_api.Services
             var result = _dbContext
                 .CollectionPoints
                 .Where(r => r.CollectionId == collectionId)
+                
                 .Select(r => r.Id)
                 .ToList();
 
