@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221210172334_order")]
+    partial class order
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,14 +85,8 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("CreatedByOrganizerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OrganizerId")
-                        .HasColumnType("int");
 
                     b.Property<string>("RegistrationNumber")
                         .HasColumnType("nvarchar(max)");
@@ -102,8 +98,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedByOrganizerId");
 
                     b.ToTable("Collections");
                 });
@@ -210,15 +204,10 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantily")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("OrderProducts");
                 });
@@ -378,15 +367,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Collection", b =>
-                {
-                    b.HasOne("managing_humanitarian_collections_api.Entities.User", "CreatedByOrganizer")
-                        .WithMany()
-                        .HasForeignKey("CreatedByOrganizerId");
-
-                    b.Navigation("CreatedByOrganizer");
-                });
-
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>
                 {
                     b.HasOne("managing_humanitarian_collections_api.Entities.Collection", null)
@@ -408,15 +388,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .WithMany("CollectionProductsOrder")
                         .HasForeignKey("OrderId");
 
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.OrderProduct", b =>
-                {
                     b.HasOne("managing_humanitarian_collections_api.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId");

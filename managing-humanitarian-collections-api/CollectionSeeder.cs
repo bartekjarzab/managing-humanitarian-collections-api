@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace managing_humanitarian_collections_api
 {
-    public class HumanitarianSeeder
+    public class CollectionSeeder
     {
         private readonly ManagingCollectionsDbContext _dbContext;
-        public HumanitarianSeeder(ManagingCollectionsDbContext dbContext)
+        public CollectionSeeder(ManagingCollectionsDbContext dbContext)
         {
             _dbContext = dbContext;
         }

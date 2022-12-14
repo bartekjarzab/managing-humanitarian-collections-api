@@ -10,6 +10,8 @@ namespace managing_humanitarian_collections_api.Entities
         public string RegistrationNumber { get; set; }
         public string Title { get; set; }
         public string Status { get; set; }
+        public int? OrganizerId { get; set; }
+        public virtual User CreatedByOrganizer { get; set; }
 
         public virtual List<CollectionPoint> CollectionPoints { get; set; }
         public virtual List<CollectionProduct> CollectionProducts { get; set; }

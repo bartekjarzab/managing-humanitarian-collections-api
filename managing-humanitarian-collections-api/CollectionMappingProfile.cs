@@ -40,6 +40,8 @@ namespace managing_humanitarian_collections_api
             CreateMap<CollectionProduct, CollectionProductDto>()
                 .ForMember(m => m.ProductName, c => c.MapFrom(s => s.Product.Name));
 
+            CreateMap<Collection, CollectionWithProductsDto>()
+                .ForMember(m => m.CollectionProducts, c => c.MapFrom(s => s.CollectionProducts));
 
             CreateMap<Collection, CollectionDto>();
             CreateMap<CollectionDto, Collection>();

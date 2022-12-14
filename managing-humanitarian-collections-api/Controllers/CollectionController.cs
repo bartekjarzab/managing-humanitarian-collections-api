@@ -3,11 +3,15 @@ using managing_humanitarian_collections_api.Services;
 using managing_humanitarian_collections_api.Models;
 using managing_humanitarian_collections_api.Entities;
 using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace managing_humanitarian_collections_api.Controllers
 {
 
     [Route("/api/collection")]
+    [ApiController]
+    [Authorize]
     public class CollectionController : ControllerBase
     {
         private readonly ICollectionService _collectionService;
@@ -19,15 +23,25 @@ namespace managing_humanitarian_collections_api.Controllers
         [HttpPost]
         public ActionResult CreateCollection([FromBody] CreateCollectionDto dto)
         {
-            var id = _collectionService.Create(dto);
+           
+            var id = _collectionService.CreateCollection(dto);
 
             return Created($"/api/collection/{id}", null);
         }
-        [HttpGet("{id}")]
-        public ActionResult<CollectionDto> Get([FromRoute] int id)
+        [HttpPut("{id}")]
+        public ActionResult Update([FromBody] UpdateCollectionStatusDto dto, [FromRoute] int id)
         {
-            var collection = _collectionService.GetById(id);
-            return Ok(collection);
+
+            _collectionService.UpdateCollectionStatus(id, dto);
+
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        public ActionResult DeleteCollection([FromRoute] int id)
+        {
+            _collectionService.Delete(id);
+
+            return NoContent();
         }
 
         [HttpGet]
@@ -38,16 +52,12 @@ namespace managing_humanitarian_collections_api.Controllers
             return Ok(collectionDtos);
         }
 
-        //[HttpGet("{id}")]
-
-        //public ActionResult<List<int>> GetIds([FromRoute] int id)
-        //{
-        //    var ids = _collectionService.GetCollectionPointIds(id);
-        //    return Ok(ids);
-        //}
-                
-        
-
+        [HttpGet("{id}")]
+        public ActionResult<IEnumerable<CollectionWithProductsDto>> GetCollectionWithProduct([FromRoute] int id)
+        {
+            var collections = _collectionService.GetCollectionWithProducts(id);
+            return Ok(collections);
+        }
 
     }
 }

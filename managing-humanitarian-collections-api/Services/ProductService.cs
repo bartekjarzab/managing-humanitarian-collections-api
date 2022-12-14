@@ -41,24 +41,12 @@ namespace managing_humanitarian_collections_api.Services
         {
             var categories = _dbContext.ProductCategories
                 .Include(c => c.Products)
+                .Where(o => o.Name == name)
                 .ToList();
 
             var productsByCategoryDtos = _mapper.Map<List<CategoriesDto>>(categories);
 
             return productsByCategoryDtos;
         }
-
-        //    public List<CollectionPointDto> GetAll(int collectionId)
-        //{
-        //    var collection = _dbContext
-        //        .Collections
-        //        .Include(a => a.CollectionPoints)
-        //        .FirstOrDefault(r => r.Id == collectionId);
-
-        //    var collectionPointDtos = _mapper.Map<List<CollectionPointDto>>(collection.CollectionPoints);
-
-        //    return collectionPointDtos;
-        //}
-
     }
 }

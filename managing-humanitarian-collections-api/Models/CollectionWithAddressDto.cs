@@ -10,7 +10,6 @@ namespace managing_humanitarian_collections_api.Models
 
         public string Status { get; set; }
 
-       // public IList<AddressDto> Addresses { get; set; }
         public IList<CollectionPointDto> CollectionPoints { get; set; }
 
     }

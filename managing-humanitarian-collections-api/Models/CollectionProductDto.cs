@@ -4,7 +4,5 @@
     {
         public string ProductName { get; set; }
         public int Quantily { get; set; }
-
-
     }
 }

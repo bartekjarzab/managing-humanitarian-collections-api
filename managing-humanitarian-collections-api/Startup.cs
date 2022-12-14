@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Authorization;
 using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Models.UserModels;
 using managing_humanitarian_collections_api.Models.QueryValidators;
+using managing_humanitarian_collections_api.Middleware;
 
 namespace managing_humanitarian_collections_api
 {
@@ -63,12 +64,14 @@ namespace managing_humanitarian_collections_api
             services.AddAutoMapper(this.GetType().Assembly);
             services.AddDbContext<ManagingCollectionsDbContext>();
             //seeder bazy danych
-            services.AddScoped<HumanitarianSeeder>();
+            services.AddScoped<CollectionSeeder>();
             services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
             services.AddControllers().AddFluentValidation();
             services.AddScoped<IUserContextService, UserContextService>();
             services.AddScoped<ICollectionPointService, CollectionPointService>();
             services.AddScoped<ICollectionService, CollectionService>();
+            services.AddScoped<ErrorHandlingMiddleware>();
+            services.AddScoped<RequestTimeMiddleware>();
             services.AddHttpContextAccessor();
             //dodanie swaggera
             services.AddSwaggerGen(c =>
@@ -86,8 +89,10 @@ namespace managing_humanitarian_collections_api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, HumanitarianSeeder seeder)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CollectionSeeder seeder)
         {
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseMiddleware<RequestTimeMiddleware>();
             seeder.Seed();
             if (env.IsDevelopment())
             {
@@ -95,6 +100,7 @@ namespace managing_humanitarian_collections_api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "managing_humanitarian_collections_api v1"));
             }
+            
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseRouting();
