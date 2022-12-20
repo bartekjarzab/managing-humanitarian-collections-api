@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221219140845_rework")]
+    partial class rework
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,8 +183,14 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int>("CollectionPointId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("DeliveryStatus")
                         .HasColumnType("bit");
+
+                    b.Property<int>("DonatorId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -196,20 +204,10 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("CollectionProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantily")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CollectionProductId");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderProducts");
                 });
@@ -402,21 +400,6 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.OrderProduct", b =>
-                {
-                    b.HasOne("managing_humanitarian_collections_api.Entities.CollectionProduct", "CollectionProduct")
-                        .WithMany()
-                        .HasForeignKey("CollectionProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Order", null)
-                        .WithMany("OrderProducts")
-                        .HasForeignKey("OrderId");
-
-                    b.Navigation("CollectionProduct");
-                });
-
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
                 {
                     b.HasOne("managing_humanitarian_collections_api.Entities.ProductCategory", "ProductCategory")
@@ -467,11 +450,6 @@ namespace managing_humanitarian_collections_api.Migrations
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>
                 {
                     b.Navigation("Address");
-                });
-
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Order", b =>
-                {
-                    b.Navigation("OrderProducts");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>

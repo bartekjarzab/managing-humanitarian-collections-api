@@ -30,6 +30,16 @@ namespace managing_humanitarian_collections_api.Entities
             modelbuilder.Entity<Role>()
                 .Property(u => u.Name)
                 .IsRequired();
+           // modelbuilder.Entity<OrderProduct>()
+           //.HasKey(ds => new { ds.CollectionProductId, ds.OrderId });
+           // modelbuilder.Entity<OrderProduct>()
+           //     .HasOne(ds => ds.CollectionProduct)
+           //     .WithMany(d => d.OrderProducts)
+           //     .HasForeignKey(ds => ds.CollectionProductId);
+           // modelbuilder.Entity<OrderProduct>()
+           //     .HasOne(ds => ds.Order)
+           //     .WithMany(d => d.OrderProducts)
+           //     .HasForeignKey(ds => ds.OrderId);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

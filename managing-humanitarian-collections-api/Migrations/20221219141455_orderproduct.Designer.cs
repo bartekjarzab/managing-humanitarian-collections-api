@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221219141455_orderproduct")]
+    partial class orderproduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,21 +176,6 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<bool>("DeliveryStatus")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Orders");
-                });
-
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.OrderProduct", b =>
                 {
                     b.Property<int>("Id")
@@ -199,17 +186,12 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<int>("CollectionProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantily")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CollectionProductId");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderProducts");
                 });
@@ -410,10 +392,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("managing_humanitarian_collections_api.Entities.Order", null)
-                        .WithMany("OrderProducts")
-                        .HasForeignKey("OrderId");
-
                     b.Navigation("CollectionProduct");
                 });
 
@@ -467,11 +445,6 @@ namespace managing_humanitarian_collections_api.Migrations
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionPoint", b =>
                 {
                     b.Navigation("Address");
-                });
-
-            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Order", b =>
-                {
-                    b.Navigation("OrderProducts");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>

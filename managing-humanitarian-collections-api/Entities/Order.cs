@@ -6,8 +6,11 @@ namespace managing_humanitarian_collections_api.Entities
     {
         public int Id { get; set; }
         public bool DeliveryStatus { get; set; }
-        public int ColectionId { get; set; }
+        //  public int ColectionId { get; set; }
+        public int? DonatorId { get; set; }
 
-        public List<CollectionProduct> CollectionProductsOrder { get; set; }
+        public virtual User CreatedByDonator { get; set; }
+
+        public ICollection<OrderProduct> OrderProducts { get; set; }
     }
 }
