@@ -10,22 +10,11 @@ namespace managing_humanitarian_collections_api.Entities
         public string RegistrationNumber { get; set; }
         public string Title { get; set; }
         public string Status { get; set; }
-        public int? OrganizerId { get; set; }
-        public virtual User CreatedByOrganizer { get; set; }
+        public int? CreatedByOrganiserId { get; set; }
+    //    public virtual User CreatedBy { get; set; }
 
         public virtual List<CollectionPoint> CollectionPoints { get; set; }
         public virtual List<CollectionProduct> CollectionProducts { get; set; }
 
-      //  public virtual List<CollectionPoint> Points { get; set; }
-
-
-        //   public DateTime? CreatedAt { get; set; }
-        //  public int CollectionPointId { get; set; }
-        //public int OrganizerId { get; set; }
-        //    public int? CommentId { get; set; }
-
-        //  public virtual CollectionPoint CollectionPoint { get; set; }
-        //public virtual Organizer Organizer { get; set; }
-        //    public virtual Comment Comment { get; set; }
     }
 }

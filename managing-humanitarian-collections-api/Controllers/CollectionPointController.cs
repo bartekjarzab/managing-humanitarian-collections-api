@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using managing_humanitarian_collections_api.Services;
-using managing_humanitarian_collections_api.Models;
 using managing_humanitarian_collections_api.Entities;
 using System.Collections.Generic;
+using managing_humanitarian_collections_api.Models.Collection;
 
 namespace managing_humanitarian_collections_api.Controllers
 {

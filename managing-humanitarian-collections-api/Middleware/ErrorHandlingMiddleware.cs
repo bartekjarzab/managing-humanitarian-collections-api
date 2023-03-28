@@ -24,7 +24,11 @@ namespace managing_humanitarian_collections_api.Middleware
             {
                 context.Response.StatusCode = 403;
             }
-
+            catch (BadRequestException badRequestException)
+            {
+                context.Response.StatusCode = 400;
+                await context.Response.WriteAsync(badRequestException.Message);
+            }
             catch (NotFoundException notFoundException)
             {
                 context.Response.StatusCode = 404;
@@ -37,8 +41,6 @@ namespace managing_humanitarian_collections_api.Middleware
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsync("Coś poszło nie tak");
             }
-            
-
         }
     }
 }

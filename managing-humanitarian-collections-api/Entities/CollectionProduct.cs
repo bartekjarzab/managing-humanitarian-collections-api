@@ -6,12 +6,12 @@ namespace managing_humanitarian_collections_api.Entities
     {
         public int Id { get; set; }
         public int Quantily { get; set; }
+        public int ProductId { get; set; }
+        public string ShortDescription { get; set; }
         public Product Product { get; set; }
+        public virtual OrderProduct OrderProduct { get; set; }
         public int CollectionId { get; set; }
 
 
-      //  public ICollection<OrderProduct> OrderProducts { get; set; }
-        //  public virtual Collection Collection { get; set; }
-        //   public virtual Order Order { get; set; }
     }
 }

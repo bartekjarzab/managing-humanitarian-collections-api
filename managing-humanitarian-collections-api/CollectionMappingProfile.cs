@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using managing_humanitarian_collections_api.Entities;
 using managing_humanitarian_collections_api.Models;
+using managing_humanitarian_collections_api.Models.Admin;
+using managing_humanitarian_collections_api.Models.Collection;
 using System;
 
 namespace managing_humanitarian_collections_api
@@ -10,10 +12,30 @@ namespace managing_humanitarian_collections_api
         public CollectionMappingProfile()
         {
             CreateMap<ProductCategory, ProductCategoryDto>();
+            CreateMap<User, UsersDto>()
+                .ForMember(u => u.RoleName, c => c.MapFrom(s => s.Role.Name));
             CreateMap<ProductCategoryDto, ProductCategory>();
             CreateMap<Product, ProductDto>();
             CreateMap<ProductProperties, ProductPropertiesDto>();
             CreateMap<CreateProductCategoryDto, ProductCategory>();
+            CreateMap<CollectionProduct, CreateCollectionProductDto>();
+            CreateMap<CreateOrderDto, Order>();
+            CreateMap<AddProductToOrderDto, OrderProduct>();
+            CreateMap<CreateCollectionProductDto, CollectionProduct>();
+            CreateMap<CollectionProduct, CollectionWithProductsDto>();
+            CreateMap<Order, OrderDto>()
+                .ForMember(o => o.Orders, c => c.MapFrom(s => s.OrderProducts));
+            CreateMap<ProductCategory, CategoryProductsDto>()
+                .ForMember(o => o.ProductList, c => c.MapFrom(s =>s.Products));
+            CreateMap<CollectionProduct, CollectionProductsListDto>()
+                .ForMember(o => o.ProductName, c => c.MapFrom(s => s.Product.Name));
+
+
+
+
+
+            CreateMap<Product, AddProductToCategoryDto>();
+            CreateMap<ProductCategory, CategeriesDto>();
             CreateMap<CreateCollectionPointDto, CollectionPoint>()
                 .ForMember(p => p.Address, c => c.MapFrom(dto => new Address()
                 { Voivodeship = dto.Voivodeship, 
@@ -22,13 +44,15 @@ namespace managing_humanitarian_collections_api
                     Postcode = dto.Postcode,
                     HouseNumber = dto.HouseNumber, 
                     Apartment = dto.Apartment }));
+            CreateMap<AddProductToCategoryDto, Product>();
 
+            CreateMap<Order, OrdersPerDonator>();
+          //  CreateMap<AddProductToCategoryDto, ProductCategory>();
+                //.ForMember(p => p.Products, c => c.MapFrom(dto => new Product()
+                //{
+                //    Name = dto.Name
+                //}));
             CreateMap<CreateCollectionDto, Collection>();
-            CreateMap<Product, ProductWithoutPropertiesDto>();
-            CreateMap<ProductCategory, CategoriesDto>()
-                .ForMember(m =>m.Products, c => c.MapFrom(s => s.Products));
-                
-            //wszystkie zbiórki z punktami + adresy 
             CreateMap<CollectionPoint, CollectionPointDto>()
                 .ForMember(m => m.Voivodeship, c => c.MapFrom(s => s.Address.Voivodeship))
                   .ForMember(m => m.Street, c => c.MapFrom(s => s.Address.Street))
@@ -36,18 +60,17 @@ namespace managing_humanitarian_collections_api
                   .ForMember(m => m.Postcode, c => c.MapFrom(s => s.Address.Postcode))
                   .ForMember(m => m.HouseNumber, c => c.MapFrom(s => s.Address.HouseNumber))
                   .ForMember(m => m.Apartment, c => c.MapFrom(s => s.Address.Apartment));
-            
-            CreateMap<CollectionProduct, CollectionProductDto>()
-                .ForMember(m => m.ProductName, c => c.MapFrom(s => s.Product.Name));
-
+            CreateMap<Product, ProductWithPropertiesDto>()
+                .ForMember(m => m.Width, c => c.MapFrom(s => s.Properties.Width))
+                .ForMember(m => m.Size, c => c.MapFrom(s => s.Properties.Size))
+                .ForMember(m => m.Weight, c => c.MapFrom(s => s.Properties.Weight))
+                .ForMember(m => m.Height, c => c.MapFrom(s => s.Properties.Height));
             CreateMap<Collection, CollectionWithProductsDto>()
                 .ForMember(m => m.CollectionProducts, c => c.MapFrom(s => s.CollectionProducts));
-
             CreateMap<Collection, CollectionDto>();
             CreateMap<CollectionDto, Collection>();
             CreateMap<Collection, CollectionWithAddressDto>()
                 .ForMember(o => o.CollectionPoints, c => c.MapFrom(s => s.CollectionPoints));
-
             CreateMap<Collection, CollectionProductsNeededDto>()
                 .ForMember(o => o.Products, c => c.MapFrom(s => s.CollectionProducts))
                 .ForMember(o => o.CollectionId, c => c.MapFrom(s => s.Id));

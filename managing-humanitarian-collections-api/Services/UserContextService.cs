@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using System;
+
 
 namespace managing_humanitarian_collections_api.Services
 {
@@ -7,6 +9,7 @@ namespace managing_humanitarian_collections_api.Services
     {
         ClaimsPrincipal User { get; }
         int? GetUserId { get; }
+        
     }
 
     public class UserContextService : IUserContextService
@@ -20,7 +23,13 @@ namespace managing_humanitarian_collections_api.Services
 
         public ClaimsPrincipal User => _httpContextAccessor.HttpContext?.User;
 
+
+
+
         public int? GetUserId =>
-            User is null ? null : (int?)int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+        User is null ? null : (int?)int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+
     }
 }

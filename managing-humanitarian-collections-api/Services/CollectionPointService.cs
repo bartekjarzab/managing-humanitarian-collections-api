@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using managing_humanitarian_collections_api.Entities;
-using managing_humanitarian_collections_api.Models;
+using managing_humanitarian_collections_api.Models.Collection;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,8 +61,6 @@ namespace managing_humanitarian_collections_api.Services
             
             return collection;
         }
-
-
         public CollectionPointDto GetById(int collectionId, int collectionPointId)
         {
             var collection = _dbContext.CollectionPoints.FirstOrDefault(r => r.Id == collectionId);
@@ -85,6 +83,7 @@ namespace managing_humanitarian_collections_api.Services
             var collection = _dbContext
                 .Collections
                 .Include(a => a.CollectionPoints)
+                .ThenInclude(a => a.Address)
                 .FirstOrDefault(r => r.Id == collectionId); 
     
             var collectionPointDtos = _mapper.Map<List<CollectionPointDto>>(collection.CollectionPoints);

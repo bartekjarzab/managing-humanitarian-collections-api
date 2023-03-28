@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using System;
 using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Entities;
 using managing_humanitarian_collections_api.Exceptions;
 using managing_humanitarian_collections_api.Models;
-using managing_humanitarian_collections_api.Models.QueryValidators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,12 +15,17 @@ namespace managing_humanitarian_collections_api.Services
     #region Intefejsy
     public interface IOrderService
     {
-        int CreateOrder(CreateOrder dto);
-        CollectionWithAddressDto GetById(int id);
-        void UpdateCollectionStatus(int id, UpdateCollectionStatusDto dto);
-        IEnumerable<CollectionWithAddressDto> GetAll();
-        IEnumerable<CollectionWithProductsDto> GetCollectionWithProducts(int id);
-        void Delete(int id);
+        int CreateOrder(CreateOrderDto dto);
+
+        int AddProductsToOrder(int collectionProductId, AddProductToOrderDto dto);
+
+        void UpdateOrderStatus(int id, UpdateOrderStatusDto dto);
+
+        IEnumerable<OrderDto> GetAll();
+
+        OrderDto GetById(int id);
+
+        IEnumerable<OrdersPerDonator> GetOrdersPerDonator(int id);
     }
 
     #endregion
@@ -41,137 +46,112 @@ namespace managing_humanitarian_collections_api.Services
             _userContextService = userContextService;
         }
 
-        #region Tworzenie koszyka
-        public int CreateOrder(CreateOrder dto)
+        public int CreateOrder(CreateOrderDto dto)
         {
             var order = _mapper.Map<Order>(dto);
-            order.DonatorId = _userContextService.GetUserId;
+            order.CreatedByDonatorId = _userContextService.GetUserId;
             _dbContext.Orders.Add(order);
             _dbContext.SaveChanges();
 
             return order.Id;
         }
-        public void SetQuantilyProductForOrder(QuantilyProductsForOrderDto dto, int id)
+
+       
+
+        public IEnumerable<OrderDto> GetAll()
         {
-            var orderProduct = _dbContext
-                .OrderProducts
-                .FirstOrDefault(r => r.Id == id);
+            var orders = _dbContext
+                .Orders
+                //.Include(r => r.Product)
+                //.ThenInclude(n => n.Address)
+                .ToList();
+
+           
 
 
-            if (orderProduct is null) throw new NotFoundException("nie znaleziono listy");
+            if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
 
-            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, orderProduct,
-             new ResourceOperationRequirement(ResourceOperation.Update)).Result;
+            var orderDtos = _mapper.Map<List<OrderDto>>(orders);
 
-            if (!authorizationResult.Succeeded)
-            {
-                throw new ForbidException();
-            }
-            //do sprawdzenia po 
-            orderProduct.Quantily = (int)dto.Quantity;
-
-            _dbContext.SaveChanges();
+            return orderDtos;
         }
 
-      
-        #endregion
-        #region zmiana statusu zbiórki
-        //public void UpdateCollectionStatus(int id, UpdateCollectionStatusDto dto)
-        //{
-        //    var collection = _dbContext
-        //        .Collections
-        //        .FirstOrDefault(r => r.Id == id);
-
-        //    if (collection is null)
-        //        throw new NotFoundException("Nie znaleziono zbiórki");
-
-        //    var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, collection,
-        //       new ResourceOperationRequirement(ResourceOperation.Update)).Result;
-
-        //    if (!authorizationResult.Succeeded)
-        //    {
-        //        throw new ForbidException();
-        //    }
-
-        //    collection.Status = dto.Status;
-
-        //    _dbContext.SaveChanges();
-        //}
-        #endregion
-
-
-        //do przemyslenia czy tylko tworzacy koszyk moze go usunac
-        public void DeleteOrder(int id)
+        public OrderDto GetById(int id)
         {
-            _logger.LogError($"Zamówienie o Id {id} została usunięta");
-
-            var order = _dbContext
-                .Orders
+            var order = _dbContext.Orders
+                .Include(n => n.OrderProducts)
+               // .ThenInclude(n => n.Product)
                 .FirstOrDefault(r => r.Id == id);
+
+            if (order is null) throw new NotFoundException("Nie znaleziono zamówienia");
+
+            var result = _mapper.Map<OrderDto>(order);
+            return result;
+        }
+
+        public int AddProductsToOrder(int orderId, AddProductToOrderDto dto)
+        {
+            var orderProduct = _mapper.Map<OrderProduct>(dto);
+
+            orderProduct.OrderId = orderId;
+
+            _dbContext.OrderProducts.Add(orderProduct);           
+
+            var newQuantily = _dbContext.CollectionProducts
+                 .Where(r => r.ProductId == dto.ProductId)
+                 .FirstOrDefault(r => r.Id == dto.CollectionProductId);
+            newQuantily.Quantily = newQuantily.Quantily - dto.Quantily;
+
+            _dbContext.SaveChanges();
+
+            return orderProduct.Id;
+
+        }
+
+        public void UpdateOrderStatus(int id, UpdateOrderStatusDto dto)
+        {
+            var order = _dbContext
+                     .Orders
+                     .Include(r => r.OrderProducts)
+                     .FirstOrDefault(r => r.Id == id);
 
             if (order is null)
                 throw new NotFoundException("Nie znaleziono zamówienia");
 
-            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
-                new ResourceOperationRequirement(ResourceOperation.Delete)).Result;
+            order.DeliveryStatus = dto.DeliveryStatus;
 
-            if (!authorizationResult.Succeeded)
+            var orderProduct = _dbContext
+                 .OrderProducts
+                 .Where(r => r.OrderId == id)
+                 .ToList();
+
+            var collectionProduct = _dbContext
+                .CollectionProducts  
+                .ToList();
+
+            if(dto.DeliveryStatus == "failed")
             {
-                throw new ForbidException();
+                foreach (var product in collectionProduct)
+                    foreach (var item in orderProduct)
+                        if (product.ProductId == item.ProductId)
+                        product.Quantily = item.Quantily + product.Quantily;
+
             }
-
-            _dbContext.Orders.Remove(order);
             _dbContext.SaveChanges();
-
         }
-        #region Lista wszystkich zbiórek z adresem
-        //public IEnumerable<CollectionWithAddressDto> GetAll()
-        //{
-        //    var collections = _dbContext
-        //        .Collections
-        //        .Include(r => r.CollectionPoints)
-        //        .ThenInclude(n => n.Address)
-        //        .ToList();
+        public IEnumerable<OrdersPerDonator> GetOrdersPerDonator(int id)
+        {
+            var orders = _dbContext
+                .Orders
+                .Where(r => r.CreatedByDonatorId == id)
+                .ToList();
 
-        //    if (collections is null) throw new NotFoundException("Collection not found");
+            if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
 
-        //    var collectionDtos = _mapper.Map<List<CollectionWithAddressDto>>(collections);
+            var orderDtos = _mapper.Map<List<OrdersPerDonator>>(orders);
 
-        //    return collectionDtos;
-        //}
-        #endregion
-
-        #region Zbiórka z adresem po id
-        //public CollectionWithAddressDto GetById(int id)
-        //{
-        //    var order = _dbContext.Orders
-        //        .Include(n => n.OrderProducts)
-        //        .ThenInclude(n => n.CollectionProduct)
-        //        .FirstOrDefault(r => r.Id == id);
- 
-        //    if (order is null) throw new NotFoundException("order not found");
-
-        //    var result = _mapper.Map<OrderWithCollectionDto>(Order);
-        //    return result;
-        //}
-        #endregion
-
-        #region Lista produktów potrzebnych w zbiórce
-
-        //public IEnumerable<CollectionWithProductsDto> GetCollectionWithProducts(int id)
-        //{
-        //    var collection = _dbContext.Collections
-        //        .Include(o => o.CollectionProducts)
-        //        .ThenInclude(o => o.Product)
-        //        .Where(r => r.Id == id)
-        //        .ToList();
-
-        //    if (collection is null) throw new NotFoundException("Collection not found");
-
-        //    var result = _mapper.Map<List<CollectionWithProductsDto>>(collection);
-        //        return result;
-        //}
-        #endregion
+            return orderDtos;
+        }
 
     }
 }

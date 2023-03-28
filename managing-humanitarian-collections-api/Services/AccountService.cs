@@ -9,6 +9,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore;
 using managing_humanitarian_collections_api.Models.UserModels;
+using managing_humanitarian_collections_api.Exceptions;
 
 namespace managing_humanitarian_collections_api.Services
 {
@@ -49,14 +50,25 @@ namespace managing_humanitarian_collections_api.Services
                 .Include(u => u.Role)
                 .FirstOrDefault(u => u.Email == dto.Email);
 
+            if (user is null)
+            {
+                throw new BadRequestException("niepoprawny login lub hasło");
+            }
+
             var result = _passwordHasher.VerifyHashedPassword(user, user.HashPassword, dto.Password);
-            if (result == PasswordVerificationResult.Failed) return "Nothing";
+            if (result == PasswordVerificationResult.Failed)
+            {
+                throw new BadRequestException("niepoprawny login lub hasło");
+            }
 
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, $"{user.Email}"),
                 new Claim(ClaimTypes.Role, $"{user.Role.Name}"),
+                new Claim("id", user.Id.ToString()),
+                new Claim("role", user.Role.Name),
+                new Claim("email", user.Email)
 
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authenticationSettings.JwtKey));
@@ -64,8 +76,10 @@ namespace managing_humanitarian_collections_api.Services
             var expires = DateTime.Now.AddDays(_authenticationSettings.JwtExpireDays);
 
             var token = new JwtSecurityToken(_authenticationSettings.JwtIssuer,
-                                             _authenticationSettings.JwtIssuer,
-                                             claims, expires: expires, signingCredentials: cred);
+                   _authenticationSettings.JwtIssuer,
+                   claims,
+                   expires: expires,
+                   signingCredentials: cred);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);

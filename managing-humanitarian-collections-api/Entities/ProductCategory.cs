@@ -6,10 +6,6 @@ namespace managing_humanitarian_collections_api.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Url { get; set; }
-       // public int ProductId { get; set; }
-
-      //   public int? CreatedById { get; set; }
-        public List<Product> Products { get; set; }
+        public virtual List<Product> Products { get; set; }
     }
 }

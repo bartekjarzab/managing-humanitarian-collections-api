@@ -24,7 +24,6 @@ namespace managing_humanitarian_collections_api
 
                     _dbContext.SaveChanges();
 
-
                 }
                 if (!_dbContext.Roles.Any())
                 {
@@ -34,6 +33,7 @@ namespace managing_humanitarian_collections_api
 
                     _dbContext.SaveChanges();
                 }
+
                 if (!_dbContext.Collections.Any())
                 {
                     var collections = GetCollections();
@@ -42,17 +42,7 @@ namespace managing_humanitarian_collections_api
 
                     _dbContext.SaveChanges();
                 }
-
-                //if (!_dbContext.Product.Any())
-                //{
-                //    var products = GetProducts();
-
-                //    _dbContext.Product.AddRange(products);
-
-                //    _dbContext.SaveChanges();
-                //}
             }
-
         }
 
         private IEnumerable<ProductCategory> GetProductCategories()
@@ -61,20 +51,163 @@ namespace managing_humanitarian_collections_api
             {
                 new ProductCategory()
                 {
-                    Name = "Ubrania",
+                    Name = "Odzież",
+                    Products = new List<Product>()
+                    {
+                        new Product()
+                        {
+                            Name = "Kurtka",
+                        },
+                        new Product()
+                        {
+                            Name = "Ubuwie",
+                        },
+                        new Product()
+                        {
+                            Name = "Koszulka",
+                        },
+                        new Product()
+                        {
+                            Name = "Spodnie",
+                        }, 
+                        new Product()
+                        {
+                            Name = "Bielizna",
+                        }, 
+                        new Product()
+                        {
+                            Name = "Czapka",
+                        },                    
+                    }
                 },
                 new ProductCategory()
                 {
                     Name = "Zabawki",
+                    Products = new List<Product>()
+                    {
+                        new Product()
+                        {
+                            Name = "Piłka",
+                        },
+                        new Product()
+                        {
+                            Name = "Rower",
+                        },
+                        new Product()
+                        {
+                            Name = "Hulajnoga",
+                        },
+                        new Product()
+                        {
+                            Name = "Klocki",
+                        },
+                        new Product()
+                        {
+                            Name = "Latawiec",
+                        },
+                        new Product()
+                        {
+                            Name = "Rakieta tenisowa",
+                        },
+                    }
 
                 },
                 new ProductCategory()
                 {
-                    Name = "Jedzenie",
+                    Name = "Żywność",
+                    Products = new List<Product>()
+                    {
+                        new Product()
+                        {
+                            Name = "Makaron",
+                        },
+                        new Product()
+                        {
+                            Name = "Mleko",
+                        },
+                        new Product()
+                        {
+                            Name = "Cukier",
+                        },
+                        new Product()
+                        {
+                            Name = "Sól",
+                        },
+                        new Product()
+                        {
+                            Name = "Masło",
+                        },
+                        new Product()
+                        {
+                            Name = "Olej",
+                        },
+                         new Product()
+                        {
+                            Name = "Woda niegazowana",
+                        },
+                    }
                 },
                 new ProductCategory()
                 {
-                    Name = "Kosmetyki"
+                    Name = "Higiena",
+                    Products = new List<Product>()
+                    {
+                        new Product()
+                        {
+                            Name = "Papier toaletowy",
+                        },
+                        new Product()
+                        {
+                            Name = "Mydło",
+                        },
+                        new Product()
+                        {
+                            Name = "Szampon",
+                        },
+                        new Product()
+                        {
+                            Name = "Ręcznik",
+                        },
+                        new Product()
+                        {
+                            Name = "Podpaski",
+                        },
+                        new Product()
+                        {
+                            Name = "Ręcznik papierowy",
+                        },
+                    }
+                },
+                 new ProductCategory()
+                {
+                    Name = "Artkuły domowe",
+                     Products = new List<Product>()
+                    {
+                        new Product()
+                        {
+                            Name = "Garnek",
+                        },
+                        new Product()
+                        {
+                            Name = "Sztućce",
+                        },
+                        new Product()
+                        {
+                            Name = "Talerz",
+                        },
+                        new Product()
+                        {
+                            Name = "Miska",
+                        },
+                        new Product()
+                        {
+                            Name = "Kubek",
+                        },
+                        new Product()
+                        {
+                            Name = "Patelnia",
+                        },
+                    }
                 },
             };
             return categories;
@@ -176,13 +309,15 @@ namespace managing_humanitarian_collections_api
                 new Role()
                 {
                     Name = "Donator",
-
-
                 },
                 new Role()
                 {
-                    Name = "Organizer",
+                    Name = "Organiser",
                 },
+                new Role()
+                {
+                    Name = "Admin"
+                }
 
             };
             return roles;

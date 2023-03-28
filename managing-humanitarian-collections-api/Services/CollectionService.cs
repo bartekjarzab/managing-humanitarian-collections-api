@@ -3,7 +3,8 @@ using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Entities;
 using managing_humanitarian_collections_api.Exceptions;
 using managing_humanitarian_collections_api.Models;
-using managing_humanitarian_collections_api.Models.QueryValidators;
+using managing_humanitarian_collections_api.Models.Collection;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,11 +17,16 @@ namespace managing_humanitarian_collections_api.Services
     public interface ICollectionService
     {
         int CreateCollection(CreateCollectionDto dto);
-        CollectionWithAddressDto GetById(int id);
+        CollectionWithAddressDto GetCollectionWithAddressById(int id);
         void UpdateCollectionStatus(int id, UpdateCollectionStatusDto dto);
         IEnumerable<CollectionWithAddressDto> GetAll();
-        IEnumerable<CollectionWithProductsDto> GetCollectionWithProducts(int id);
         void Delete(int id);
+        List<CollectionProductsListDto> GetAllProducts(int collectionId);
+        int CreateCollectionNeededProducts(int collectionId, CreateCollectionProductDto dto);
+        List<CollectionDto> GetAllCollections();
+        CollectionDto GetCollection(int id);
+
+
     }
 
     #endregion
@@ -45,14 +51,37 @@ namespace managing_humanitarian_collections_api.Services
         public int CreateCollection(CreateCollectionDto dto)
         {
             var collection = _mapper.Map<Collection>(dto);
-            collection.OrganizerId = _userContextService.GetUserId;
+            collection.CreatedByOrganiserId = _userContextService.GetUserId;
             _dbContext.Collections.Add(collection);
             _dbContext.SaveChanges();
 
             return collection.Id;
         }
         #endregion
-        #region zmiana statusu zbiórki
+        #region Wszystkie zbiórki
+        public List<CollectionDto> GetAllCollections()
+        {
+            var collections = _dbContext
+                .Collections
+                .ToList();
+
+            var collectionsDtoS = _mapper.Map<List<CollectionDto>>(collections);
+
+            return collectionsDtoS;
+        }
+
+        public CollectionDto GetCollection(int id)
+        {
+            var collection = _dbContext
+                .Collections
+                .FirstOrDefault(r => r.Id == id);
+
+            var collectionDto = _mapper.Map<CollectionDto>(collection);
+
+            return collectionDto;
+        }
+        #endregion
+        #region Zmiana statusu zbiórki
         public void UpdateCollectionStatus(int id, UpdateCollectionStatusDto dto)
         {
             var collection = _dbContext
@@ -75,7 +104,7 @@ namespace managing_humanitarian_collections_api.Services
             _dbContext.SaveChanges();
         }
         #endregion
-
+        #region Usunięcie zbiórki
         public void Delete(int id)
         {
             _logger.LogError($"Zbiórka o Id {id} została usunięta");
@@ -97,8 +126,8 @@ namespace managing_humanitarian_collections_api.Services
 
             _dbContext.Collections.Remove(collection);
             _dbContext.SaveChanges();
-
         }
+        #endregion
         #region Lista wszystkich zbiórek z adresem
         public IEnumerable<CollectionWithAddressDto> GetAll()
         {
@@ -115,11 +144,11 @@ namespace managing_humanitarian_collections_api.Services
             return collectionDtos;
         }
         #endregion
-
         #region Zbiórka z adresem po id
-        public CollectionWithAddressDto GetById(int id)
+        public CollectionWithAddressDto GetCollectionWithAddressById(int id)
         {
-            var collection = _dbContext.Collections
+            var collection = _dbContext
+                .Collections
                 .Include(n => n.CollectionPoints)
                 .ThenInclude(n => n.Address)
                 .FirstOrDefault(r => r.Id == id);
@@ -130,23 +159,33 @@ namespace managing_humanitarian_collections_api.Services
             return result;
         }
         #endregion
-
         #region Lista produktów potrzebnych w zbiórce
 
-        public IEnumerable<CollectionWithProductsDto> GetCollectionWithProducts(int id)
+        public List<CollectionProductsListDto> GetAllProducts(int collectionId)
         {
-            var collection = _dbContext.Collections
-                .Include(o => o.CollectionProducts)
-                .ThenInclude(o => o.Product)
-                .Where(r => r.Id == id)
-                .ToList();
+            var collection = _dbContext
+                .Collections
+                .Include(a => a.CollectionProducts)
+                .ThenInclude(a => a.Product)
+                .FirstOrDefault(r => r.Id == collectionId);
 
-            if (collection is null) throw new NotFoundException("Collection not found");
+            var collectionProductsDtos = _mapper.Map<List<CollectionProductsListDto>>(collection.CollectionProducts);
 
-            var result = _mapper.Map<List<CollectionWithProductsDto>>(collection);
-                return result;
+            return collectionProductsDtos;
         }
         #endregion
+        #region Dodanie potrzebnych przedmiotów do zbiórki
+        public int CreateCollectionNeededProducts(int collectionId, CreateCollectionProductDto dto)
+        {           
+            var collectionProduct = _mapper.Map<CollectionProduct>(dto);
 
+            collectionProduct.CollectionId = collectionId;
+
+            _dbContext.CollectionProducts.Add(collectionProduct);
+            _dbContext.SaveChanges();
+
+            return collectionProduct.Id;
+        }
+        #endregion
     }
 }

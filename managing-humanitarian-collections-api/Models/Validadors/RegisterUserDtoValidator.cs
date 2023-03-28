@@ -14,15 +14,16 @@ namespace managing_humanitarian_collections_api.Models.Validadors
                 .EmailAddress();
 
             RuleFor(x => x.Password)
-                .MinimumLength(6);
+                .MinimumLength(6)
+                .MaximumLength(40);
 
-            RuleFor(x => x.ConfirmPassword).Equal(e => e.Password);
+            //RuleFor(x => x.ConfirmPassword).Equal(e => e.Password);
 
             RuleFor(x => x.Email)
                 .Custom((value, context) =>
                 {
-                    var emailInUser = dbContext.Users.Any(u => u.Email == value);
-                    if(emailInUser)
+                    var emailInUse = dbContext.Users.Any(u => u.Email == value);
+                    if(emailInUse)
                     {
                         context.AddFailure("Email", "Adres mailowy jest zajety");
                     }    

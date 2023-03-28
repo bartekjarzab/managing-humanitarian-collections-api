@@ -11,9 +11,7 @@ namespace managing_humanitarian_collections_api.Entities
         public DbSet<CollectionPoint> CollectionPoints { get; set; }
         public DbSet<CollectionProduct> CollectionProducts { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        //public DbSet<Donator> Donators { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        //public DbSet<Organizer> Organizers { get; set; }
+        public DbSet<Order> Orders { get; set; }   
         public DbSet<Product> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
@@ -28,18 +26,8 @@ namespace managing_humanitarian_collections_api.Entities
                 .Property(u => u.Email)
                 .IsRequired();
             modelbuilder.Entity<Role>()
-                .Property(u => u.Name)
+                .Property(r => r.Name)
                 .IsRequired();
-           // modelbuilder.Entity<OrderProduct>()
-           //.HasKey(ds => new { ds.CollectionProductId, ds.OrderId });
-           // modelbuilder.Entity<OrderProduct>()
-           //     .HasOne(ds => ds.CollectionProduct)
-           //     .WithMany(d => d.OrderProducts)
-           //     .HasForeignKey(ds => ds.CollectionProductId);
-           // modelbuilder.Entity<OrderProduct>()
-           //     .HasOne(ds => ds.Order)
-           //     .WithMany(d => d.OrderProducts)
-           //     .HasForeignKey(ds => ds.OrderId);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
