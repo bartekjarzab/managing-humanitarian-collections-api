@@ -9,7 +9,6 @@ namespace managing_humanitarian_collections_api.Entities
         public int ProductId { get; set; }
         public string ShortDescription { get; set; }
         public Product Product { get; set; }
-        public virtual OrderProduct OrderProduct { get; set; }
         public int CollectionId { get; set; }
 
 

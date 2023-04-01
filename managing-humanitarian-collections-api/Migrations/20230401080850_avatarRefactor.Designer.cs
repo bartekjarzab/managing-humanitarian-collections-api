@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230401080850_avatarRefactor")]
+    partial class avatarRefactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,11 +70,11 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<int?>("CreatedByOrganiserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RegistrationNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("RegistrationNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");

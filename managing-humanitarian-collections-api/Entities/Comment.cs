@@ -3,10 +3,9 @@
     public class Comment
     {
         public int Id { get; set; }
-        public string Review { get; set; }
+        public string? Review { get; set; }
+        public int UserId { get; set; }
+        public int CollectionId { get; set; }
 
-     //   public int DonatorId { get; set; }
-
-     //   public virtual Donator Donator { get; set; }
     }
 }

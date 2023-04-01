@@ -11,7 +11,7 @@ namespace managing_humanitarian_collections_api.Controllers
 {
 
     [Route("/api/collection")]
-    //[ApiController]
+    [ApiController]
     [Authorize]
     public class CollectionController : ControllerBase
     {
@@ -21,6 +21,7 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             _collectionService = collectionService;
         }
+
         [HttpPost]
         public ActionResult CreateCollection([FromBody] CreateCollectionDto dto)
         {
@@ -74,6 +75,12 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             var result = _collectionService.GetAllProducts(collectionId);
             return Ok(result);
+        }
+        [HttpGet("ordersPerDonator/{id}")]
+        public ActionResult GetOrganiserCollections([FromRoute] int id)
+        {
+            var collections = _collectionService.GetCollectionPerOrganiser(id);
+            return Ok(collections);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace managing_humanitarian_collections_api.Models.Validadors
                 .MinimumLength(6)
                 .MaximumLength(40);
 
-            //RuleFor(x => x.ConfirmPassword).Equal(e => e.Password);
+
 
             RuleFor(x => x.Email)
                 .Custom((value, context) =>

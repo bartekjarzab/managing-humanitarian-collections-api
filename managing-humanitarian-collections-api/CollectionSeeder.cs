@@ -219,7 +219,7 @@ namespace managing_humanitarian_collections_api
             {
                 new Collection
                 {
-                    RegistrationNumber ="11111",
+                    RegistrationNumber = 11111,
                     Title = "Zbiórka zywnosci",
                     Status = "Otwarta",
                     CollectionPoints = new List<CollectionPoint>()
@@ -259,7 +259,7 @@ namespace managing_humanitarian_collections_api
 
                 new Collection
                 {
-                    RegistrationNumber ="11111",
+                    RegistrationNumber = 1113411,
                     Title = "Zbiórka ubran",
                     Status = "zamknieta",
                     CollectionPoints = new List<CollectionPoint>()
@@ -308,16 +308,16 @@ namespace managing_humanitarian_collections_api
             {
                 new Role()
                 {
-                    Name = "Donator",
-                },
-                new Role()
-                {
-                    Name = "Organiser",
-                },
-                new Role()
-                {
                     Name = "Admin"
-                }
+                },
+                new Role()
+                {
+                    Name = "Darczyńca",
+                },
+                new Role()
+                {
+                    Name = "Organizator",
+                },
 
             };
             return roles;

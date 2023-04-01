@@ -20,6 +20,7 @@ namespace managing_humanitarian_collections_api
             CreateMap<CreateProductCategoryDto, ProductCategory>();
             CreateMap<CollectionProduct, CreateCollectionProductDto>();
             CreateMap<CreateOrderDto, Order>();
+            CreateMap<Order, CreateOrderDto>();
             CreateMap<AddProductToOrderDto, OrderProduct>();
             CreateMap<CreateCollectionProductDto, CollectionProduct>();
             CreateMap<CollectionProduct, CollectionWithProductsDto>();
@@ -30,6 +31,15 @@ namespace managing_humanitarian_collections_api
             CreateMap<CollectionProduct, CollectionProductsListDto>()
                 .ForMember(o => o.ProductName, c => c.MapFrom(s => s.Product.Name));
 
+            CreateMap<User, UserProfileDto>()
+                .ForMember(u => u.Name, c => c.MapFrom(r => r.Profile.Name))
+                .ForMember(u => u.FirstName, c => c.MapFrom(r => r.Profile.FirstName))
+                .ForMember(u => u.LastName, c => c.MapFrom(r => r.Profile.LastName))
+                .ForMember(u => u.Nip, c => c.MapFrom(r => r.Profile.Nip))
+                .ForMember(u => u.Regon, c => c.MapFrom(r => r.Profile.Regon))
+                .ForMember(u => u.ContactNumber, c => c.MapFrom(r => r.Profile.ContactNumber))
+                .ForMember(u => u.Avatar, c => c.MapFrom(r => r.Profile.Avatar));
+         
 
 
 

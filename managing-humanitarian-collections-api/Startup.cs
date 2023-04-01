@@ -66,7 +66,7 @@ namespace managing_humanitarian_collections_api
 
             services.AddScoped<ICollectionService, CollectionService>();
             services.AddScoped<ICollectionPointService, CollectionPointService>();
-            services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IOrderService, OrderService>();
             //Serwisy rejestracyjne
             services.AddScoped<IAccountService, AccountService>();
@@ -93,6 +93,10 @@ namespace managing_humanitarian_collections_api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CollectionSeeder seeder)
         {
+            app.UseCors(x =>
+            {
+                x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+            });
             seeder.Seed();
             if (env.IsDevelopment())
             {
@@ -106,10 +110,7 @@ namespace managing_humanitarian_collections_api
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
-            app.UseCors(x =>
-            {
-                x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
-            });
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

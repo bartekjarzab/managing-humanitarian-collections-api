@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace managing_humanitarian_collections_api.Controllers
 {
 
-    [Route("/api/order")]
+    [Route("/api")]
     [ApiController]
     [Authorize]
     public class OrderController : ControllerBase
@@ -20,39 +20,49 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             _orderService = orderService;
         }
-        [HttpPost]
-        public ActionResult CreateOrder([FromBody] CreateOrderDto dto)
+        #region Tworzenie zamowienia
+        [HttpPost("collection/{collectionId}/orders")]
+        public ActionResult CreateOrder([FromBody] CreateOrderDto dto, [FromRoute] int collectionId)
         {
+            var newOrderId = _orderService.CreateOrder(collectionId, dto);
 
-            var id = _orderService.CreateOrder(dto);
-
-            return Created($"/api/order/{id}", null);
+            return Ok(newOrderId);
+            
         }
-
-        [HttpPost("{orderId}/orderProducts")]
+        #endregion
+        #region Dodanie produktu do zamówienia
+        [HttpPost("orders/{orderId}/orderProducts")]
         public ActionResult AddProductToOrder([FromRoute] int orderId, [FromBody] AddProductToOrderDto dto)
         {
-            var newListId = _orderService.AddProductsToOrder(orderId, dto);
+            var newProductId = _orderService.AddProductsToOrder(orderId, dto);
 
-            return Created($"api/order/{orderId}/orderProducts/{newListId}", null);
-
+            return Ok(newProductId);
         }
-
+        #endregion
+        #region Wszystkie zamówienia darczyńcy
+        [HttpGet("users/{userId}/orders")]
+        public ActionResult GetOrdersPerDonator([FromRoute] int userId)
+        {
+            var ordersDto = _orderService.GetAllDonatorOrders(userId);
+            return Ok(ordersDto);
+        }
+        #endregion
+        #region Wszystkie zamówienia zbiórki
+        [HttpGet("collection/{collectionId}/orders")]
+        public ActionResult GetOrdersPerCollection([FromRoute] int collectionId)
+        {
+            var ordersDto = _orderService.GetAllCollectionOrders(collectionId);
+            return Ok(ordersDto);
+        }
+        #endregion
         [HttpPut("{id}")]
         public ActionResult UpdateStatus([FromBody] UpdateOrderStatusDto dto, [FromRoute] int id)
         {
-
             _orderService.UpdateOrderStatus(id, dto);
 
             return Ok();
         }
-        [HttpGet]
-        public ActionResult<IEnumerable<OrderDto>> GetAll()
-        {
-            var orderDtos = _orderService.GetAll();
-
-            return Ok(orderDtos);
-        }
+        
         [HttpGet("ordersPerDonator/{id}")]
         public ActionResult GetDonatorOrders([FromRoute] int id)
         {

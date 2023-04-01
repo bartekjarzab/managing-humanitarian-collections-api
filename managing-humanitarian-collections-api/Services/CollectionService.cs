@@ -25,7 +25,7 @@ namespace managing_humanitarian_collections_api.Services
         int CreateCollectionNeededProducts(int collectionId, CreateCollectionProductDto dto);
         List<CollectionDto> GetAllCollections();
         CollectionDto GetCollection(int id);
-
+        IEnumerable<Collection> GetCollectionPerOrganiser(int id);
 
     }
 
@@ -187,5 +187,20 @@ namespace managing_humanitarian_collections_api.Services
             return collectionProduct.Id;
         }
         #endregion
+
+
+        public IEnumerable <Collection> GetCollectionPerOrganiser(int id)
+        {
+            var collection = _dbContext
+                .Collections
+                .Where(r => r.CreatedByOrganiserId == id)
+                .ToList();
+
+            if (collection is null) throw new NotFoundException("Nie znaleziono zbiórek");
+
+            var collectionDtos = _mapper.Map<List<Collection>>(collection);
+
+            return collectionDtos;
+        }
     }
 }

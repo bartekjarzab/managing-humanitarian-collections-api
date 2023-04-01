@@ -3,11 +3,14 @@ using managing_humanitarian_collections_api.Services;
 using managing_humanitarian_collections_api.Entities;
 using System.Collections.Generic;
 using managing_humanitarian_collections_api.Models.Collection;
+using Microsoft.AspNetCore.Authorization;
 
 namespace managing_humanitarian_collections_api.Controllers
 {
+    
 
     [Route("/api/collection/{collectionId}/collectionPoint")]
+    [Authorize]
     public class CollectionPointController : ControllerBase
     {
         private readonly ICollectionPointService _collectionPointService;

@@ -16,11 +16,20 @@ namespace managing_humanitarian_collections_api.Controllers
     {
         private readonly IProductService _productService;
 
+
+
+
         public ProductController(IProductService productService)
         {
             _productService = productService;
         }
 
+        [HttpGet("products")]
+        public ActionResult <ProductDto> GetProducts([FromQuery] string search)
+        {
+            var result = _productService.GetAllProducts(search);
+            return Ok(result);
+        }
 
         [HttpGet("categories/{categoryId}/products")]
         public ActionResult <CategoryProductsDto> Get([FromRoute] int categoryId)

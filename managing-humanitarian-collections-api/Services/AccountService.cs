@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore;
 using managing_humanitarian_collections_api.Models.UserModels;
 using managing_humanitarian_collections_api.Exceptions;
+using managing_humanitarian_collections_api.Models;
 
 namespace managing_humanitarian_collections_api.Services
 {
@@ -42,6 +43,24 @@ namespace managing_humanitarian_collections_api.Services
             newUser.HashPassword = hashedPassword;
             _context.Users.Add(newUser);
             _context.SaveChanges();
+
+            var user = _context.Users
+                .FirstOrDefault(u => u.Email == dto.Email);
+            var newProfile = new Profile()
+            {
+                User = user,
+                FirstName = null,
+                LastName = null,
+                Avatar = null,
+                ContactNumber = null,
+                Nip = null,
+                Regon = null,
+                Name = null,
+            };
+            _context.Profiles.Add(newProfile);
+            _context.Attach(user);
+            _context.SaveChanges();
+
 
         }
         public string GenerateJwt(LoginDto dto)
@@ -84,5 +103,7 @@ namespace managing_humanitarian_collections_api.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);
         }
+
+        
     }
 }

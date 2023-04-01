@@ -2,6 +2,7 @@
 {
     public class CreateOrderDto
     {
-        public string deliveryStatus { get; set; } = "in progress";
+        public string DeliveryStatus { get; set; }
+        public int CollectionId { get; set; } 
     }
 }

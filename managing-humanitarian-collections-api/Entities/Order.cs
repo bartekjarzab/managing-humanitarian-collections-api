@@ -7,7 +7,8 @@ namespace managing_humanitarian_collections_api.Entities
         public int Id { get; set; }
         public string DeliveryStatus { get; set; }
         public int? CreatedByDonatorId { get; set; }
-
+        public int CollectionId { get; set; }
         public List<OrderProduct> OrderProducts { get; set; }
+
     }
 }

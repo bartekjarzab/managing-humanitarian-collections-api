@@ -4,7 +4,7 @@
     {
         public int ProductId { get; set; }
         public int Quantily { get; set; }
+        
         public int CollectionProductId { get; set; }
-
     }
 }

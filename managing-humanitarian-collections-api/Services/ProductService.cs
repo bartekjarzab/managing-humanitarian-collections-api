@@ -19,6 +19,7 @@ namespace managing_humanitarian_collections_api.Services
         ProductWithPropertiesDto GetProductWithProperties(int id);
 
         int AddProductsToCategory(int categoryId, AddProductToCategoryDto dto);
+        public List<ProductDto> GetAllProducts(string search);
 
 
     }
@@ -82,5 +83,18 @@ namespace managing_humanitarian_collections_api.Services
             return product.Id;
 
         }
+        public List<ProductDto> GetAllProducts(string search)
+        {
+            var products = _dbContext
+                .Products
+                .Include(r => r.Category)
+                .Where(r => search == null || (r.Name.ToLower().Contains(search.ToLower())))
+                .ToList();
+
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
+
+            return productDtos;
+        }
+
     }
 }

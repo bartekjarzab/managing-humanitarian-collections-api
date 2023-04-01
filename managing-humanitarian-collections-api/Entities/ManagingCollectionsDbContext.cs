@@ -6,7 +6,6 @@ namespace managing_humanitarian_collections_api.Entities
     {
        
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<Avatar> Avatars { get; set; }
         public DbSet<Collection> Collections { get; set; }
         public DbSet<CollectionPoint> CollectionPoints { get; set; }
         public DbSet<CollectionProduct> CollectionProducts { get; set; }

@@ -15,16 +15,17 @@ namespace managing_humanitarian_collections_api.Services
     #region Intefejsy
     public interface IOrderService
     {
-        int CreateOrder(CreateOrderDto dto);
+        int CreateOrder(int collectionId, CreateOrderDto dto);
 
-        int AddProductsToOrder(int collectionProductId, AddProductToOrderDto dto);
+        int AddProductsToOrder(int orderId, AddProductToOrderDto dto);
 
-        void UpdateOrderStatus(int id, UpdateOrderStatusDto dto);
+        void UpdateOrderStatus(int orderId, UpdateOrderStatusDto dto);
 
-        IEnumerable<OrderDto> GetAll();
+        IEnumerable<CreateOrderDto> GetAllDonatorOrders(int userId);
 
+        IEnumerable<CreateOrderDto> GetAllCollectionOrders(int collectionId);
         OrderDto GetById(int id);
-
+         
         IEnumerable<OrdersPerDonator> GetOrdersPerDonator(int id);
     }
 
@@ -45,36 +46,75 @@ namespace managing_humanitarian_collections_api.Services
             _authorizationService = authorizationService;
             _userContextService = userContextService;
         }
-
-        public int CreateOrder(CreateOrderDto dto)
+        #region Utworzenie zamówienie
+        public int CreateOrder(int collectionId, CreateOrderDto dto)
         {
-            var order = _mapper.Map<Order>(dto);
-            order.CreatedByDonatorId = _userContextService.GetUserId;
-            _dbContext.Orders.Add(order);
+
+            var collection = GetCollectionById(collectionId);
+            
+            var orderEntity = _mapper.Map<Order>(dto);
+            orderEntity.CreatedByDonatorId = _userContextService.GetUserId;
+            orderEntity.CollectionId = collectionId;
+            _dbContext.Orders.Add(orderEntity);
             _dbContext.SaveChanges();
 
-            return order.Id;
+            return orderEntity.Id;
         }
+        #endregion
 
-       
+        #region Dodanie produktów do zamówienia oraz odjęcie ilości zapotrzebowania
+        public int AddProductsToOrder(int orderId, AddProductToOrderDto dto)
+        {
+            var orderProduct = _mapper.Map<OrderProduct>(dto);
 
-        public IEnumerable<OrderDto> GetAll()
+            orderProduct.OrderId = orderId;
+
+            _dbContext.OrderProducts.Add(orderProduct);
+
+            var newQuantily = _dbContext.CollectionProducts
+                 .Where(r => r.ProductId == dto.ProductId)
+                 .FirstOrDefault(r => r.Id == dto.CollectionProductId);
+
+            newQuantily.Quantily = newQuantily.Quantily - dto.Quantily;
+
+            _dbContext.SaveChanges();
+
+            return orderProduct.Id;
+
+        }
+        #endregion
+
+        #region Wszystkie zamówienia użytkownika
+        public IEnumerable<CreateOrderDto> GetAllDonatorOrders(int id)
         {
             var orders = _dbContext
                 .Orders
-                //.Include(r => r.Product)
-                //.ThenInclude(n => n.Address)
+                .Where(r => r.CreatedByDonatorId == id)
                 .ToList();
-
-           
-
 
             if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
 
-            var orderDtos = _mapper.Map<List<OrderDto>>(orders);
+            var orderDtos = _mapper.Map<List<CreateOrderDto>>(orders);
 
             return orderDtos;
         }
+        #endregion
+
+        #region Wszystkie zamówienia dla zbiórki
+        public IEnumerable<CreateOrderDto> GetAllCollectionOrders(int id)
+        {
+            var orders = _dbContext
+                .Orders
+                .Where(r => r.CollectionId == id)
+                .ToList();
+
+            if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
+
+            var orderDtos = _mapper.Map<List<CreateOrderDto>>(orders);
+
+            return orderDtos;
+        }
+        #endregion
 
         public OrderDto GetById(int id)
         {
@@ -89,24 +129,7 @@ namespace managing_humanitarian_collections_api.Services
             return result;
         }
 
-        public int AddProductsToOrder(int orderId, AddProductToOrderDto dto)
-        {
-            var orderProduct = _mapper.Map<OrderProduct>(dto);
-
-            orderProduct.OrderId = orderId;
-
-            _dbContext.OrderProducts.Add(orderProduct);           
-
-            var newQuantily = _dbContext.CollectionProducts
-                 .Where(r => r.ProductId == dto.ProductId)
-                 .FirstOrDefault(r => r.Id == dto.CollectionProductId);
-            newQuantily.Quantily = newQuantily.Quantily - dto.Quantily;
-
-            _dbContext.SaveChanges();
-
-            return orderProduct.Id;
-
-        }
+       
 
         public void UpdateOrderStatus(int id, UpdateOrderStatusDto dto)
         {
@@ -151,6 +174,18 @@ namespace managing_humanitarian_collections_api.Services
             var orderDtos = _mapper.Map<List<OrdersPerDonator>>(orders);
 
             return orderDtos;
+        }
+
+        private Collection GetCollectionById(int collectionId)
+        {
+            var collection = _dbContext
+                .Collections
+                .Include(r =>r.Orders).
+                FirstOrDefault(r => r.Id == collectionId);
+            if (collection == null)
+                throw new NotFoundException("Zbiórka nie znaleziona");
+
+            return collection;
         }
 
     }
