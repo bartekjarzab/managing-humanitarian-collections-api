@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using managing_humanitarian_collections_api.Entities;
+using managing_humanitarian_collections_api.Exceptions;
 using managing_humanitarian_collections_api.Models;
 using managing_humanitarian_collections_api.Models.Collection;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ namespace managing_humanitarian_collections_api.Services
 
         int AddProductsToCategory(int categoryId, AddProductToCategoryDto dto);
         public List<ProductDto> GetAllProducts(string search);
+        List<ProductDto> GetProductsByCategory(int id, string search);
 
 
     }
@@ -32,7 +34,6 @@ namespace managing_humanitarian_collections_api.Services
             _dbContext = dbContext;
             _mapper = mapper;
         }
-
 
         public List<CategeriesDto> GetAllCategories()
         {
@@ -72,12 +73,22 @@ namespace managing_humanitarian_collections_api.Services
 
         public int AddProductsToCategory(int categoryId, AddProductToCategoryDto dto)
         {
-            var product = _mapper.Map<Product>(dto);
 
+
+            var product = _mapper.Map<Product>(dto);
              product.ProductCategoryId = categoryId;
 
-            _dbContext.Products.Add(product);
+            //var products = _dbContext
+            //    .Products
+            //    .Where(r => r.ProductCategoryId == categoryId)
+            //    .ToList();
 
+            //foreach(var productItem in products)
+            //if(productItem.Name.ToLower().Contains(dto.Name.ToLower()))
+            //    throw new BadRequestException("Product już istnieje");
+
+           
+            _dbContext.Products.Add(product);
             _dbContext.SaveChanges();
 
             return product.Id;
@@ -88,6 +99,20 @@ namespace managing_humanitarian_collections_api.Services
             var products = _dbContext
                 .Products
                 .Include(r => r.Category)
+                .Where(r => search == null || (r.Name.ToLower().Contains(search.ToLower())))
+                .ToList();
+
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
+
+            return productDtos;
+        }
+
+        public List<ProductDto> GetProductsByCategory(int id, string search)
+        {
+            var products = _dbContext
+                .Products
+                .Include(r => r.Category)
+                .Where(r => r.ProductCategoryId == id)
                 .Where(r => search == null || (r.Name.ToLower().Contains(search.ToLower())))
                 .ToList();
 

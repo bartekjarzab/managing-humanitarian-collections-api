@@ -49,13 +49,13 @@ namespace managing_humanitarian_collections_api.Services
             var newProfile = new Profile()
             {
                 User = user,
-                FirstName = null,
+                FirstName = dto.Email,
                 LastName = null,
                 Avatar = null,
                 ContactNumber = null,
                 Nip = null,
                 Regon = null,
-                Name = null,
+                Name = dto.Email,
             };
             _context.Profiles.Add(newProfile);
             _context.Attach(user);

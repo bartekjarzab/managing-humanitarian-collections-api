@@ -31,10 +31,10 @@ namespace managing_humanitarian_collections_api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("categories/{categoryId}/products")]
-        public ActionResult <CategoryProductsDto> Get([FromRoute] int categoryId)
+        [HttpGet("categories/{id}/products")]
+        public ActionResult<ProductDto> GetProducts([FromRoute] int id, [FromQuery] string search)
         {
-            var result = _productService.GetProductsByCategory(categoryId);
+            var result = _productService.GetProductsByCategory(id, search);
             return Ok(result);
         }
 

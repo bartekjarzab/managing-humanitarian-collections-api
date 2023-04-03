@@ -26,7 +26,7 @@ namespace managing_humanitarian_collections_api.Controllers
         public ActionResult CreateCollection([FromBody] CreateCollectionDto dto)
         {
             var id = _collectionService.CreateCollection(dto);
-            return Created($"/api/collection/{id}", null);
+            return Ok(id);
         }
         [HttpGet("{collectionId}/points")]
         public ActionResult GetCollectionWithPoints([FromRoute] int collectionId)

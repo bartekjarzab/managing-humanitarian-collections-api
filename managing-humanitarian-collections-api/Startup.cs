@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Authorization;
 using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Models.UserModels;
 using managing_humanitarian_collections_api.Middleware;
+using managing_humanitarian_collections_api.Models;
 
 namespace managing_humanitarian_collections_api
 {
@@ -70,8 +71,12 @@ namespace managing_humanitarian_collections_api
             services.AddScoped<IOrderService, OrderService>();
             //Serwisy rejestracyjne
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            services.AddScoped<IValidator<AddProductToCategoryDto>, AddProductToCategoryDtoValidator>();
             services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
+            
+           
 
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
             //seeder bazy danych

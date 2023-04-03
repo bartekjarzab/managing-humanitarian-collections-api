@@ -15,7 +15,7 @@ namespace managing_humanitarian_collections_api
             CreateMap<User, UsersDto>()
                 .ForMember(u => u.RoleName, c => c.MapFrom(s => s.Role.Name));
             CreateMap<ProductCategoryDto, ProductCategory>();
-            CreateMap<Product, ProductDto>();
+            CreateMap<Product, CreateProductDto>();
             CreateMap<ProductProperties, ProductPropertiesDto>();
             CreateMap<CreateProductCategoryDto, ProductCategory>();
             CreateMap<CollectionProduct, CreateCollectionProductDto>();
@@ -30,7 +30,11 @@ namespace managing_humanitarian_collections_api
                 .ForMember(o => o.ProductList, c => c.MapFrom(s =>s.Products));
             CreateMap<CollectionProduct, CollectionProductsListDto>()
                 .ForMember(o => o.ProductName, c => c.MapFrom(s => s.Product.Name));
+            CreateMap<CreateCommentDto, Comment>();
 
+            CreateMap<Comment, CommentDto>()
+                .ForMember(o => o.FirstName, c => c.MapFrom(s => s.CreatedBy.Profile.FirstName))
+                .ForMember(o => o.LastName, c => c.MapFrom(s => s.CreatedBy.Profile.LastName));
             CreateMap<User, UserProfileDto>()
                 .ForMember(u => u.Name, c => c.MapFrom(r => r.Profile.Name))
                 .ForMember(u => u.FirstName, c => c.MapFrom(r => r.Profile.FirstName))
@@ -39,11 +43,8 @@ namespace managing_humanitarian_collections_api
                 .ForMember(u => u.Regon, c => c.MapFrom(r => r.Profile.Regon))
                 .ForMember(u => u.ContactNumber, c => c.MapFrom(r => r.Profile.ContactNumber))
                 .ForMember(u => u.Avatar, c => c.MapFrom(r => r.Profile.Avatar));
-         
-
-
-
-
+            CreateMap<Product, ProductDto>()
+                .ForMember(o => o.Category, c => c.MapFrom(s => s.Category.Name));
             CreateMap<Product, AddProductToCategoryDto>();
             CreateMap<ProductCategory, CategeriesDto>();
             CreateMap<CreateCollectionPointDto, CollectionPoint>()
