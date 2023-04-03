@@ -49,7 +49,7 @@ namespace managing_humanitarian_collections_api
             CreateMap<ProductCategory, CategeriesDto>();
             CreateMap<CreateCollectionPointDto, CollectionPoint>()
                 .ForMember(p => p.Address, c => c.MapFrom(dto => new Address()
-                { Voivodeship = dto.Voivodeship, 
+                { VoivodeshipId = dto.VoivodeshipId, 
                     Street = dto.Street, 
                     City = dto.City,
                     Postcode = dto.Postcode,
@@ -65,7 +65,7 @@ namespace managing_humanitarian_collections_api
                 //}));
             CreateMap<CreateCollectionDto, Collection>();
             CreateMap<CollectionPoint, CollectionPointDto>()
-                .ForMember(m => m.Voivodeship, c => c.MapFrom(s => s.Address.Voivodeship))
+                .ForMember(m => m.Voivodeship, c => c.MapFrom(s => s.Address.Voivodeship.Name))
                   .ForMember(m => m.Street, c => c.MapFrom(s => s.Address.Street))
                   .ForMember(m => m.City, c => c.MapFrom(s => s.Address.City))
                   .ForMember(m => m.Postcode, c => c.MapFrom(s => s.Address.Postcode))

@@ -6,7 +6,7 @@
         public string OpeningHour { get; set; }
         public string ClosingHour { get; set; }
 
-        public string Voivodeship { get; set; }
+        public int VoivodeshipId { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
         public string Postcode { get; set; }

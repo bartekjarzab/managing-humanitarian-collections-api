@@ -17,7 +17,6 @@ namespace managing_humanitarian_collections_api.Services
     public interface ICollectionService
     {
         int CreateCollection(CreateCollectionDto dto);
-        CollectionWithAddressDto GetCollectionWithAddressById(int id);
         void UpdateCollectionStatus(int id, UpdateCollectionStatusDto dto);
         IEnumerable<CollectionWithAddressDto> GetAll();
         void Delete(int id);
@@ -91,13 +90,7 @@ namespace managing_humanitarian_collections_api.Services
             if (collection is null)
                 throw new NotFoundException("Nie znaleziono zbiórki");
 
-            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, collection,
-               new ResourceOperationRequirement(ResourceOperation.Update)).Result;
-
-            if (!authorizationResult.Succeeded)
-            {
-                throw new ForbidException();
-            }
+          
 
             collection.Status = dto.Status;
 
@@ -144,21 +137,7 @@ namespace managing_humanitarian_collections_api.Services
             return collectionDtos;
         }
         #endregion
-        #region Zbiórka z adresem po id
-        public CollectionWithAddressDto GetCollectionWithAddressById(int id)
-        {
-            var collection = _dbContext
-                .Collections
-                .Include(n => n.CollectionPoints)
-                .ThenInclude(n => n.Address)
-                .FirstOrDefault(r => r.Id == id);
- 
-            if (collection is null) throw new NotFoundException("Collection not found");
 
-            var result = _mapper.Map<CollectionWithAddressDto>(collection);
-            return result;
-        }
-        #endregion
         #region Lista produktów potrzebnych w zbiórce
 
         public List<CollectionProductsListDto> GetAllProducts(int collectionId)

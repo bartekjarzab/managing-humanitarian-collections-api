@@ -28,12 +28,6 @@ namespace managing_humanitarian_collections_api.Controllers
             var id = _collectionService.CreateCollection(dto);
             return Ok(id);
         }
-        [HttpGet("{collectionId}/points")]
-        public ActionResult GetCollectionWithPoints([FromRoute] int collectionId)
-        {
-            var collectionDtos = _collectionService.GetCollectionWithAddressById(collectionId);
-            return Ok(collectionDtos);
-        }
         [HttpPut("{id}")]
         public ActionResult Update([FromBody] UpdateCollectionStatusDto dto, [FromRoute] int id)
         {

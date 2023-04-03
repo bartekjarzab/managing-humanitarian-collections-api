@@ -25,6 +25,16 @@ namespace managing_humanitarian_collections_api
                     _dbContext.SaveChanges();
 
                 }
+                if (!_dbContext.Voivodeships.Any())
+                {
+                    var voivodeships = GetVoivodeships();
+
+                    _dbContext.Voivodeships.AddRange(voivodeships);
+
+                    _dbContext.SaveChanges();
+                }
+
+
                 if (!_dbContext.Roles.Any())
                 {
                     var roles = GetRoles();
@@ -42,8 +52,86 @@ namespace managing_humanitarian_collections_api
 
                     _dbContext.SaveChanges();
                 }
+
+               
             }
         }
+
+
+        private IEnumerable<Voivodeship> GetVoivodeships()
+        {
+            var voivodeships = new List<Voivodeship>()
+            {
+                new Voivodeship()
+                {
+                    Name = "dolnośląskie"
+                },
+                new Voivodeship()
+                {
+                    Name = "kujawsko-pomorskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "lubelskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "lubuskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "łódzkie",
+                },
+                new Voivodeship()
+                {
+                    Name = "małopolskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "mazowieckie",
+                },
+                new Voivodeship()
+                {
+                    Name = "opolskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "podkarpackie",
+                },
+                new Voivodeship()
+                {
+                    Name = "podlaskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "pomorskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "śląskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "świętokrzyskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "warmińsko-mazurskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "wielkopolskie",
+                },
+                new Voivodeship()
+                {
+                    Name = "zachodniopomorskie",
+                },
+
+            };
+            return voivodeships;
+
+        }
+
 
         private IEnumerable<ProductCategory> GetProductCategories()
         {
@@ -231,7 +319,8 @@ namespace managing_humanitarian_collections_api
                               ClosingHour = "19:00",
                               Address = new Address()
                               {
-                                   Voivodeship ="kujawsko-pomorskie",
+
+                                   VoivodeshipId = 1,
                                    Street = "krotka",
                                    City = "Torun",
                                    Postcode = "87-100",
@@ -246,7 +335,7 @@ namespace managing_humanitarian_collections_api
                               ClosingHour = "24:00",
                               Address = new Address()
                               {
-                                   Voivodeship ="pomorskie",
+                                   VoivodeshipId = 1,
                                    Street = "dluga",
                                    City = "Torun",
                                    Postcode = "87-100",
@@ -271,7 +360,7 @@ namespace managing_humanitarian_collections_api
                               ClosingHour = "19:00",
                               Address = new Address()
                               {
-                                   Voivodeship ="pomorskie",
+                                   VoivodeshipId = 1,
                                    Street = "mala",
                                    City = "Torun",
                                    Postcode = "87-100",
@@ -286,7 +375,8 @@ namespace managing_humanitarian_collections_api
                               ClosingHour = "24:00",
                               Address = new Address()
                               {
-                                   Voivodeship ="pomorskie",
+
+                                   VoivodeshipId = 1,
                                    Street = "duza",
                                    City = "Torun",
                                    Postcode = "87-100",
@@ -323,5 +413,9 @@ namespace managing_humanitarian_collections_api
             return roles;
 
         }
+
+       
     }
+    
 }
+

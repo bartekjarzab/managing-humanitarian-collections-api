@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using managing_humanitarian_collections_api.Entities;
 
 namespace managing_humanitarian_collections_api.Migrations
 {
     [DbContext(typeof(ManagingCollectionsDbContext))]
-    partial class ManagingCollectionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230403070241_address-remake")]
+    partial class addressremake
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +46,10 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("VoivodeshipId")
+                    b.Property<string>("VoivodeshipId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("VoivodeshipId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -52,7 +57,7 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.HasIndex("CollectionPointId")
                         .IsUnique();
 
-                    b.HasIndex("VoivodeshipId");
+                    b.HasIndex("VoivodeshipId1");
 
                     b.ToTable("Addresses");
                 });
@@ -381,9 +386,7 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.HasOne("managing_humanitarian_collections_api.Entities.Voivodeship", "Voivodeship")
                         .WithMany()
-                        .HasForeignKey("VoivodeshipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("VoivodeshipId1");
 
                     b.Navigation("Voivodeship");
                 });

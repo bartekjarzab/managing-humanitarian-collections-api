@@ -84,6 +84,7 @@ namespace managing_humanitarian_collections_api.Services
                 .Collections
                 .Include(a => a.CollectionPoints)
                 .ThenInclude(a => a.Address)
+                .ThenInclude(a => a.Voivodeship)
                 .FirstOrDefault(r => r.Id == collectionId); 
     
             var collectionPointDtos = _mapper.Map<List<CollectionPointDto>>(collection.CollectionPoints);

@@ -11,6 +11,7 @@ namespace managing_humanitarian_collections_api.Entities
         public DbSet<CollectionProduct> CollectionProducts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Order> Orders { get; set; }   
+        public DbSet<Voivodeship> Voivodeships { get; set; }   
         public DbSet<Product> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
