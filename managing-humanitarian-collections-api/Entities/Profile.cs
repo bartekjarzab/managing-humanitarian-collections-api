@@ -16,6 +16,7 @@
         public int UserId { get; set; }
         public virtual User User { get; set; }
         #endregion
-        public string? Avatar { get; set; }
+        public int? AvatarId { get; set; }
+        public virtual Avatar Avatar { get; set; }
     }
 }

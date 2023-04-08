@@ -3,12 +3,12 @@ using System;
 using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Entities;
 using managing_humanitarian_collections_api.Exceptions;
-using managing_humanitarian_collections_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using managing_humanitarian_collections_api.Models.Order;
 
 namespace managing_humanitarian_collections_api.Services
 {
@@ -21,12 +21,15 @@ namespace managing_humanitarian_collections_api.Services
 
         void UpdateOrderStatus(int orderId, UpdateOrderStatusDto dto);
 
-        IEnumerable<CreateOrderDto> GetAllDonatorOrders(int userId);
+        IEnumerable<OrderDto> GetAllDonatorOrders(int userId);
 
-        IEnumerable<CreateOrderDto> GetAllCollectionOrders(int collectionId);
+        IEnumerable<OrderDto> GetAllCollectionOrders(int collectionId);
         OrderDto GetById(int id);
          
         IEnumerable<OrdersPerDonator> GetOrdersPerDonator(int id);
+        IEnumerable<OrderProductListDto> GetProductsPerOrder(int id);
+
+        void DeleteProductFromOrder(int orderId, int orderProductId);
     }
 
     #endregion
@@ -48,32 +51,63 @@ namespace managing_humanitarian_collections_api.Services
         }
         #region Utworzenie zamówienie
         public int CreateOrder(int collectionId, CreateOrderDto dto)
-        {
-
-            var collection = GetCollectionById(collectionId);
-            
+        {   
             var orderEntity = _mapper.Map<Order>(dto);
-            orderEntity.CreatedByDonatorId = _userContextService.GetUserId;
+            orderEntity.CreatedById = _userContextService.GetUserId;
+            orderEntity.CreatedOrderDate = DateTime.Now.ToString("dd/MM/yyyy, HH:mm");
+            orderEntity.OrderStatusId = 3;
             orderEntity.CollectionId = collectionId;
+
+            var orderIsProgress = _dbContext
+                .Orders
+                .Where(x => x.CollectionId == collectionId)
+                .Where(x => x.OrderStatusId == 3)
+                .FirstOrDefault(x => x.CreatedById == (_userContextService.GetUserId));
+
+            if (orderIsProgress != null)
+                throw new BadRequestException("Masz już utworzone zamówienie dla tej zbiórki");
+
             _dbContext.Orders.Add(orderEntity);
             _dbContext.SaveChanges();
+
+         
 
             return orderEntity.Id;
         }
         #endregion
 
+
+
+
         #region Dodanie produktów do zamówienia oraz odjęcie ilości zapotrzebowania
         public int AddProductsToOrder(int orderId, AddProductToOrderDto dto)
         {
+            var order = _dbContext
+                .OrderProducts
+                .Where(p => p.OrderId == orderId)
+                .ToList();
+
+            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
+          new ResourceOperationRequirement(ResourceOperation.Create)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException("Nie masz uprawnień do dodania przedmiotu");
+            }
+
             var orderProduct = _mapper.Map<OrderProduct>(dto);
-
             orderProduct.OrderId = orderId;
-
-            _dbContext.OrderProducts.Add(orderProduct);
 
             var newQuantily = _dbContext.CollectionProducts
                  .Where(r => r.ProductId == dto.ProductId)
                  .FirstOrDefault(r => r.Id == dto.CollectionProductId);
+            foreach(var product in order)
+            if (product.ProductId == dto.ProductId)
+                throw new BadRequestException("Przedmiot został już dodany do zamówienia");
+            if (newQuantily != null)
+                if (newQuantily.Quantily < orderProduct.Quantily)
+                    throw new BadRequestException("Zbiórka nie potrzebuje tyle przedmiotów");
+            _dbContext.OrderProducts.Add(orderProduct);
 
             newQuantily.Quantily = newQuantily.Quantily - dto.Quantily;
 
@@ -84,35 +118,75 @@ namespace managing_humanitarian_collections_api.Services
         }
         #endregion
 
+        #region usunięcie przedmiotu z koszyka oraz aktualizacja stanu zapotrzebowania dla zbiórki
+
+        public void DeleteProductFromOrder(int orderId, int orderProductId)
+        {
+            var orderProducts = _dbContext
+                .Orders
+                .Include(x => x.OrderProducts)
+                .FirstOrDefault(p => p.Id == orderId);
+
+                var collectionProducts = _dbContext
+                .CollectionProducts
+                .Where(x => x.CollectionId == orderProducts.CollectionId)
+                .ToList();
+
+            var ordProduct = _dbContext
+               .OrderProducts
+               .FirstOrDefault(x => x.Id == orderProductId);
+
+            foreach (var product in collectionProducts)
+               if(product.ProductId == ordProduct.ProductId)
+                    product.Quantily = product.Quantily + ordProduct.Quantily;
+
+           
+
+            _dbContext.OrderProducts.Remove(ordProduct);
+            _dbContext.SaveChanges();
+
+        }
+
+        #endregion
+
+
         #region Wszystkie zamówienia użytkownika
-        public IEnumerable<CreateOrderDto> GetAllDonatorOrders(int id)
+        public IEnumerable<OrderDto> GetAllDonatorOrders(int id)
         {
             var orders = _dbContext
                 .Orders
-                .Where(r => r.CreatedByDonatorId == id)
+                .Include(r => r.CreatedBy)
+                .ThenInclude(r => r.Profile)
+                .Include(r => r.OrderStatus)
+                .Where(r => r.CreatedById == id)
                 .ToList();
 
             if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
 
-            var orderDtos = _mapper.Map<List<CreateOrderDto>>(orders);
+            var orderDtos = _mapper.Map<List<OrderDto>>(orders);
 
             return orderDtos;
         }
         #endregion
 
         #region Wszystkie zamówienia dla zbiórki
-        public IEnumerable<CreateOrderDto> GetAllCollectionOrders(int id)
+        public IEnumerable<OrderDto> GetAllCollectionOrders(int id)
         {
             var orders = _dbContext
                 .Orders
+                .Include(r => r.CreatedBy)
+                .ThenInclude(r => r.Profile)
+                .Include(r => r.OrderStatus)
                 .Where(r => r.CollectionId == id)
                 .ToList();
 
             if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
 
-            var orderDtos = _mapper.Map<List<CreateOrderDto>>(orders);
+            var orderDtos = _mapper.Map<List<OrderDto>>(orders);
 
             return orderDtos;
+
+
         }
         #endregion
 
@@ -129,7 +203,23 @@ namespace managing_humanitarian_collections_api.Services
             return result;
         }
 
-       
+        public IEnumerable<OrderProductListDto> GetProductsPerOrder(int id)
+        {
+            var orderProducts = _dbContext
+                .OrderProducts
+                .Include(r => r.Product)
+                .ThenInclude(r => r.Properties)
+                .Where(r => r.OrderId == id)
+                .ToList();
+
+            if (orderProducts == null)
+                throw new NotFoundException("nie znaleziono produktów dla tego zamówienia");
+
+            var orderProductDtos = _mapper.Map<List<OrderProductListDto>>(orderProducts);
+
+            return orderProductDtos;
+
+        }
 
         public void UpdateOrderStatus(int id, UpdateOrderStatusDto dto)
         {
@@ -141,7 +231,16 @@ namespace managing_humanitarian_collections_api.Services
             if (order is null)
                 throw new NotFoundException("Nie znaleziono zamówienia");
 
-            order.DeliveryStatus = dto.DeliveryStatus;
+            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
+            new ResourceOperationRequirement(ResourceOperation.Update)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException("Brak uprawnień");
+            }
+
+            order.OrderStatusId = dto.OrderStatusId;
+            order.CreatedOrderDate = DateTime.Now.ToString("dd/MM/yyyy, HH:mm");
 
             var orderProduct = _dbContext
                  .OrderProducts
@@ -152,13 +251,12 @@ namespace managing_humanitarian_collections_api.Services
                 .CollectionProducts  
                 .ToList();
 
-            if(dto.DeliveryStatus == "failed")
+            if(dto.OrderStatusId == 2)
             {
                 foreach (var product in collectionProduct)
                     foreach (var item in orderProduct)
                         if (product.ProductId == item.ProductId)
                         product.Quantily = item.Quantily + product.Quantily;
-
             }
             _dbContext.SaveChanges();
         }
@@ -166,7 +264,7 @@ namespace managing_humanitarian_collections_api.Services
         {
             var orders = _dbContext
                 .Orders
-                .Where(r => r.CreatedByDonatorId == id)
+                .Where(r => r.CreatedById == id)
                 .ToList();
 
             if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");

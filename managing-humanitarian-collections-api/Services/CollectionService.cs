@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using System;
 using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Entities;
 using managing_humanitarian_collections_api.Exceptions;
-using managing_humanitarian_collections_api.Models;
 using managing_humanitarian_collections_api.Models.Collection;
 
 using Microsoft.AspNetCore.Authorization;
@@ -18,13 +18,14 @@ namespace managing_humanitarian_collections_api.Services
     {
         int CreateCollection(CreateCollectionDto dto);
         void UpdateCollectionStatus(int id, UpdateCollectionStatusDto dto);
-        IEnumerable<CollectionWithAddressDto> GetAll();
+        IEnumerable<CollectionPointDto> GetAll();
         void Delete(int id);
         List<CollectionProductsListDto> GetAllProducts(int collectionId);
         int CreateCollectionNeededProducts(int collectionId, CreateCollectionProductDto dto);
         List<CollectionDto> GetAllCollections();
         CollectionDto GetCollection(int id);
-        IEnumerable<Collection> GetCollectionPerOrganiser(int id);
+        IEnumerable<CollectionDto> GetCollectionPerOrganiser(int id);
+        void EditCollection(int collectionId, CreateCollectionDto dto);
 
     }
 
@@ -51,6 +52,7 @@ namespace managing_humanitarian_collections_api.Services
         {
             var collection = _mapper.Map<Collection>(dto);
             collection.CreatedByOrganiserId = _userContextService.GetUserId;
+            collection.CreateDate = DateTime.Now.ToString("dd/MM/yyyy, HH:mm");
             _dbContext.Collections.Add(collection);
             _dbContext.SaveChanges();
 
@@ -62,18 +64,30 @@ namespace managing_humanitarian_collections_api.Services
         {
             var collections = _dbContext
                 .Collections
+                .Include(r => r.CollectionStatus)
+                .Include(r => r.CreatedBy.Profile)
+                .OrderByDescending(x => x.CollectionStatus)
+                .OrderByDescending(x => x.Id)
                 .ToList();
+
+            if (collections is null)
+                throw new NotFoundException("Nie znaleziono zbiórek");
 
             var collectionsDtoS = _mapper.Map<List<CollectionDto>>(collections);
 
             return collectionsDtoS;
         }
-
+        #endregion
+        #region Pobierz konkretną zbiórkę
         public CollectionDto GetCollection(int id)
         {
             var collection = _dbContext
                 .Collections
+                .Include(_r => _r.CollectionStatus)
                 .FirstOrDefault(r => r.Id == id);
+
+            if (collection is null)
+                throw new NotFoundException("Nie znaleziono zbiórki");
 
             var collectionDto = _mapper.Map<CollectionDto>(collection);
 
@@ -85,15 +99,26 @@ namespace managing_humanitarian_collections_api.Services
         {
             var collection = _dbContext
                 .Collections
+                .Include(r => r.CreatedBy)
+                .ThenInclude(r => r.Role)
                 .FirstOrDefault(r => r.Id == id);
 
             if (collection is null)
                 throw new NotFoundException("Nie znaleziono zbiórki");
 
-          
 
-            collection.Status = dto.Status;
+            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, collection,
+               new ResourceOperationRequirement(ResourceOperation.Update)).Result;
 
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException("Nie masz uprawnień do edycji");
+            }
+
+            if (dto.CollectionStatusId != null)
+            {
+                collection.CollectionStatusId = dto.CollectionStatusId;
+            }
             _dbContext.SaveChanges();
         }
         #endregion
@@ -114,7 +139,7 @@ namespace managing_humanitarian_collections_api.Services
 
             if (!authorizationResult.Succeeded)
             {
-                throw new ForbidException();
+                throw new ForbidException("Brak uprawnień do usunięcie zbiórki");
             }
 
             _dbContext.Collections.Remove(collection);
@@ -122,7 +147,7 @@ namespace managing_humanitarian_collections_api.Services
         }
         #endregion
         #region Lista wszystkich zbiórek z adresem
-        public IEnumerable<CollectionWithAddressDto> GetAll()
+        public IEnumerable<CollectionPointDto> GetAll()
         {
             var collections = _dbContext
                 .Collections
@@ -132,12 +157,12 @@ namespace managing_humanitarian_collections_api.Services
 
             if (collections is null) throw new NotFoundException("Collection not found");
 
-            var collectionDtos = _mapper.Map<List<CollectionWithAddressDto>>(collections);
+
+            var collectionDtos = _mapper.Map<List<CollectionPointDto>>(collections);
 
             return collectionDtos;
         }
         #endregion
-
         #region Lista produktów potrzebnych w zbiórce
 
         public List<CollectionProductsListDto> GetAllProducts(int collectionId)
@@ -146,6 +171,7 @@ namespace managing_humanitarian_collections_api.Services
                 .Collections
                 .Include(a => a.CollectionProducts)
                 .ThenInclude(a => a.Product)
+                .ThenInclude(a => a.Properties)
                 .FirstOrDefault(r => r.Id == collectionId);
 
             var collectionProductsDtos = _mapper.Map<List<CollectionProductsListDto>>(collection.CollectionProducts);
@@ -155,10 +181,19 @@ namespace managing_humanitarian_collections_api.Services
         #endregion
         #region Dodanie potrzebnych przedmiotów do zbiórki
         public int CreateCollectionNeededProducts(int collectionId, CreateCollectionProductDto dto)
-        {           
-            var collectionProduct = _mapper.Map<CollectionProduct>(dto);
+        {
 
-            collectionProduct.CollectionId = collectionId;
+            var productInUse = _dbContext
+              .CollectionProducts
+              .Where(r => r.ProductId == dto.ProductId)
+              .Where(r => r.CollectionId == collectionId)
+              .Any();
+            if (productInUse)
+                throw new BadRequestException("Produkt już istnieje");
+
+
+            var collectionProduct = _mapper.Map<CollectionProduct>(dto);
+            collectionProduct.CollectionId = collectionId;    
 
             _dbContext.CollectionProducts.Add(collectionProduct);
             _dbContext.SaveChanges();
@@ -168,18 +203,56 @@ namespace managing_humanitarian_collections_api.Services
         #endregion
 
 
-        public IEnumerable <Collection> GetCollectionPerOrganiser(int id)
+        public IEnumerable <CollectionDto> GetCollectionPerOrganiser(int id)
         {
             var collection = _dbContext
                 .Collections
+                .Include(x =>x.CollectionStatus)
                 .Where(r => r.CreatedByOrganiserId == id)
                 .ToList();
 
             if (collection is null) throw new NotFoundException("Nie znaleziono zbiórek");
 
-            var collectionDtos = _mapper.Map<List<Collection>>(collection);
+            var collectionDtos = _mapper.Map<List<CollectionDto>>(collection);
 
             return collectionDtos;
         }
+
+        public void EditCollection(int collectionId, CreateCollectionDto dto)
+        {
+            var collection = _dbContext
+                .Collections
+                .FirstOrDefault(x => x.Id == collectionId);
+
+            if (collection == null)
+                throw new NotFoundException("nie znaleziono zbiórki");
+
+            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, collection,
+             new ResourceOperationRequirement(ResourceOperation.Update)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException("Nie masz uprawnień do edycji zbiórki");
+            }
+
+            if (dto.RegistrationNumber != null)
+            {
+                collection.RegistrationNumber = dto.RegistrationNumber;
+            }
+            if (dto.RegistrationNumber != null)
+            {
+                collection.Title = dto.Title;
+            }
+            if (dto.Description != null)
+            {
+                collection.Description = dto.Description;
+            }
+            if (dto.CollectionStatusId != null)
+            {
+                collection.CollectionStatusId = dto.CollectionStatusId;
+            }
+            _dbContext.SaveChanges();
+        }
+
     }
 }

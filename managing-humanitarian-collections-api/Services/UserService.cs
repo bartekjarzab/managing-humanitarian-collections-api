@@ -75,6 +75,7 @@ namespace managing_humanitarian_collections_api.Services
             var profile = _dbContext
                 .Users
                 .Include(r => r.Profile)
+                .ThenInclude(r=> r.Avatar)
                 .FirstOrDefault(r => r.Id == id);
 
             var profileDto = _mapper.Map<UserProfileDto>(profile);
@@ -110,9 +111,9 @@ namespace managing_humanitarian_collections_api.Services
             {
                 profile.ContactNumber = dto.ContactNumber;
             }
-            if (dto.Avatar != null)
+            if (dto.AvatarId != null)
             {
-                profile.Avatar = dto.Avatar;
+                profile.AvatarId = dto.AvatarId;
             }
             _dbContext.SaveChanges();
         }

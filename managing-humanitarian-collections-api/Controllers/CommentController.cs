@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using managing_humanitarian_collections_api.Services;
-using managing_humanitarian_collections_api.Models;
 using managing_humanitarian_collections_api.Entities;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using managing_humanitarian_collections_api.Models.Comment;
 
 namespace managing_humanitarian_collections_api.Controllers
 {
 
-    [Route("/api/collection/{collectionId}/comments")]
+    [Route("/api/")]
     [ApiController]
     [Authorize]
     public class CommentController : ControllerBase
@@ -20,8 +20,8 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             _commentService = commentService;
         }
-        #region Tworzenie zamowienia
-        [HttpPost()]
+        #region Tworzenie komentarza
+        [HttpPost("collection/{collectionId}/comments")]
         public ActionResult AddComment([FromBody] CreateCommentDto dto, [FromRoute] int collectionId)
         {
             var newCommentId = _commentService.CreateComment(collectionId, dto);
@@ -30,14 +30,21 @@ namespace managing_humanitarian_collections_api.Controllers
 
         }
         #endregion
-
-        [HttpGet()]
+        #region Pobranie wszystkich komentarzy dla zbiórki
+        [HttpGet("collection/{collectionId}/comments")]
         public ActionResult GetCommentsPerCollection([FromRoute] int collectionId)
         {
             var commentsDto = _commentService.GetAllCollectionComments(collectionId);
             return Ok(commentsDto);
         }
+        [Authorize(Roles = "Admin, Organizator")]
+        #endregion
+        [HttpDelete("comments/{id}")]
+        public ActionResult DeleteThisComment([FromRoute] int id)
+        {
+            _commentService.DeleteComment(id);
 
-
+            return Ok("Komentarz usunięty");
+        }
     }
 }

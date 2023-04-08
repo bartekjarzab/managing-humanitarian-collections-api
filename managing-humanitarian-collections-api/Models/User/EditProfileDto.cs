@@ -11,7 +11,7 @@
         public int? Nip { get; set; }
         public int? Regon { get; set; }
         public string Name { get; set; }
-        public string? Avatar { get; set; }
+        public int? AvatarId { get; set; }
         #endregion
         public string ContactNumber { get; set; }
 

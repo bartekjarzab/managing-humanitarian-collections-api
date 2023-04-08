@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using managing_humanitarian_collections_api.Services;
-using managing_humanitarian_collections_api.Models;
 using managing_humanitarian_collections_api.Entities;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using managing_humanitarian_collections_api.Models.Order;
 
 namespace managing_humanitarian_collections_api.Controllers
 {
@@ -25,6 +25,7 @@ namespace managing_humanitarian_collections_api.Controllers
         public ActionResult CreateOrder([FromBody] CreateOrderDto dto, [FromRoute] int collectionId)
         {
             var newOrderId = _orderService.CreateOrder(collectionId, dto);
+
 
             return Ok(newOrderId);
             
@@ -55,12 +56,12 @@ namespace managing_humanitarian_collections_api.Controllers
             return Ok(ordersDto);
         }
         #endregion
-        [HttpPut("{id}")]
+        [HttpPut("order/{id}")]
         public ActionResult UpdateStatus([FromBody] UpdateOrderStatusDto dto, [FromRoute] int id)
         {
             _orderService.UpdateOrderStatus(id, dto);
 
-            return Ok();
+            return Ok("Status zamówienia został zmieniony");
         }
         
         [HttpGet("ordersPerDonator/{id}")]
@@ -68,6 +69,20 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             var orders = _orderService.GetOrdersPerDonator(id);
             return Ok(orders);
+        }
+
+        [HttpGet("orders/{orderId}/orderProducts")]
+
+        public ActionResult GetOrderProductsPerOrder([FromRoute] int orderId)
+        {
+            var orderProducts = _orderService.GetProductsPerOrder(orderId);
+            return Ok(orderProducts);
+        }
+        [HttpDelete("/order/{orderId}/orderProducts/{orderProductId}")]
+        public ActionResult DeleteProductFromOrder([FromRoute] int orderId, int orderProductId)
+        {
+           _orderService.DeleteProductFromOrder(orderId, orderProductId);
+            return Ok("Przedmiot usunięty z koszyka");
         }
 
     }

@@ -27,7 +27,7 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             _userService.BanUser(id);
 
-            return NoContent();
+            return Ok("Użytkownik został zbanowany");
         }
         [Authorize(Roles = "Admin")]
         [HttpGet]
@@ -50,7 +50,7 @@ namespace managing_humanitarian_collections_api.Controllers
         {
 
             _userService.EditProfile(dto, userId);
-            return Ok();
+            return Ok("Profil został zedytowany");
         }
 
     }

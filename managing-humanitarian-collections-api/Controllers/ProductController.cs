@@ -5,23 +5,28 @@ using managing_humanitarian_collections_api.Entities;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using managing_humanitarian_collections_api.Models.Products;
+using managing_humanitarian_collections_api.Models.Product;
 
 namespace managing_humanitarian_collections_api.Controllers
 {
 
     [Route("/api")]
-    //[ApiController]
-    //[Authorize]
+    [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
-
-
-
-
         public ProductController(IProductService productService)
         {
             _productService = productService;
+        }
+
+        [HttpDelete("products/{productId}")]
+        public ActionResult DeleteProduct([FromRoute] int productId)
+        {
+            _productService.DeleteProduct(productId);
+            return Ok("Produkt został usunięty");
         }
 
         [HttpGet("products")]
@@ -47,7 +52,7 @@ namespace managing_humanitarian_collections_api.Controllers
         }
 
         [HttpGet("products/{productId}")]
-        public ActionResult<ProductWithPropertiesDto> GetProduct([FromRoute] int productId)
+        public ActionResult<ProductPropertiesDto> GetProduct([FromRoute] int productId)
         {
             var result = _productService.GetProductWithProperties(productId);
             return Ok(result);
@@ -58,7 +63,7 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             var newProductId = _productService.AddProductsToCategory(categoryId, dto);
 
-            return Created($"api/categories/{categoryId}/products/{newProductId}", null);
+            return Ok(newProductId);
 
         }
     }

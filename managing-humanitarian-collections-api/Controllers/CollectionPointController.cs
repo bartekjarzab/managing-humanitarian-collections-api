@@ -19,23 +19,13 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             _collectionPointService = collectionPointService;
         }
-        //[HttpPost]
-        //public ActionResult CreateCollectionPoint([FromBody] CreateCollectionPointDto dto)
-        //{
-        //    var id = _collectionPointService.Create(dto);
-
-        //    return Created($"/api/collectionPoint/{id}", null);
-        //}
         [HttpPost]
-        public ActionResult CreatePointCollectionForCollection([FromRoute] int collectionId, [FromBody] CreateCollectionPointDto dto)
+        public ActionResult CreateCollectionpointForCollection([FromRoute] int collectionId, [FromBody] CreateCollectionPointDto dto)
         {
             var newPointId = _collectionPointService.CreatePointForCollection(collectionId, dto);
 
-            return Created($"api/collection/{collectionId}/collectionPoint/{newPointId}", null);
+            return Ok("Punkt zbiórki został dodany");
         }
-        //zwracanie informacji dotyczących adresu punktu
-
-
 
         [HttpGet("{collectionPointId}")]
         public ActionResult<CollectionPointDto> Get([FromRoute] int collectionId, [FromRoute] int collectionPointId)
@@ -48,6 +38,22 @@ namespace managing_humanitarian_collections_api.Controllers
         {
             var result = _collectionPointService.GetAll(collectionId);
             return Ok(result);
+        }
+        [Authorize(Roles = "Organizator")]
+        [HttpPut("{collectionPointId}")]
+        public ActionResult EditcollectionPoint([FromBody] CreateCollectionPointDto dto,[FromRoute] int collectionId, int collectionPointId)
+        {
+
+            _collectionPointService.EditCollectionPoint(collectionId, collectionPointId, dto);
+            return Ok("Profil został zedytowany");
+        }
+        [Authorize(Roles = "Organizator")]
+        [HttpDelete("{id}")]
+        public ActionResult DeleteThisCollectionPoint([FromRoute] int id, int collectionId)
+        {
+            _collectionPointService.DeleteCollectionPoint(id, collectionId);
+
+            return Ok("Punkt zbiórki usunięty");
         }
     }
 }

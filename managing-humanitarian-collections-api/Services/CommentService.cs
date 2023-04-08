@@ -3,12 +3,12 @@ using System;
 using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Entities;
 using managing_humanitarian_collections_api.Exceptions;
-using managing_humanitarian_collections_api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using managing_humanitarian_collections_api.Models.Comment;
 
 namespace managing_humanitarian_collections_api.Services
 {
@@ -17,6 +17,7 @@ namespace managing_humanitarian_collections_api.Services
     {
         int CreateComment(int collectionId, CreateCommentDto dto);
         IEnumerable<CommentDto> GetAllCollectionComments(int collectionId);
+        void DeleteComment(int id);
     }
 
     #endregion
@@ -39,16 +40,30 @@ namespace managing_humanitarian_collections_api.Services
         #region Utworzenie komentarz
         public int CreateComment(int collectionId, CreateCommentDto dto)
         {
-
-            //var collection = GetCollectionById(collectionId);
-
             var comment = _mapper.Map<Comment>(dto);
             comment.CreatedById = _userContextService.GetUserId;
+            comment.CreatedCommentDate = DateTime.Now.ToString("dd/MM/yyyy, HH:mm");
             comment.CollectionId = collectionId;
             _dbContext.Comments.Add(comment);
             _dbContext.SaveChanges();
 
             return comment.Id;
+        }
+
+        public void DeleteComment(int id)
+        {
+            _logger.LogError($"Komentarz od id {id} został usunięty");
+
+            var comment = _dbContext
+                .Comments
+                .FirstOrDefault(r => r.Id == id);
+
+            if (comment is null)
+                throw new NotFoundException("Nie znaleziono komentarz");
+
+            _dbContext.Comments.Remove(comment);
+            _dbContext.SaveChanges();
+
         }
 
         public IEnumerable<CommentDto> GetAllCollectionComments(int collectionId)

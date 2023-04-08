@@ -12,6 +12,9 @@ namespace managing_humanitarian_collections_api.Entities
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Order> Orders { get; set; }   
         public DbSet<Voivodeship> Voivodeships { get; set; }   
+        public DbSet<Avatar> Avatars { get; set; }   
+        public DbSet<CollectionStatus> CollectionStatuses { get; set; }   
+        public DbSet<OrderStatus> OrderStatuses { get; set; }   
         public DbSet<Product> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
@@ -22,12 +25,7 @@ namespace managing_humanitarian_collections_api.Entities
 
         protected override void OnModelCreating(ModelBuilder modelbuilder)
         {
-            modelbuilder.Entity<User>()
-                .Property(u => u.Email)
-                .IsRequired();
-            modelbuilder.Entity<Role>()
-                .Property(r => r.Name)
-                .IsRequired();
+
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

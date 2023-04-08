@@ -16,7 +16,6 @@ using managing_humanitarian_collections_api.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using FluentValidation;
-using managing_humanitarian_collections_api.Models.Validadors;
 using FluentValidation.AspNetCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -24,7 +23,10 @@ using Microsoft.AspNetCore.Authorization;
 using managing_humanitarian_collections_api.Authorization;
 using managing_humanitarian_collections_api.Models.UserModels;
 using managing_humanitarian_collections_api.Middleware;
-using managing_humanitarian_collections_api.Models;
+using managing_humanitarian_collections_api.Models.Products;
+using managing_humanitarian_collections_api.Common;
+using managing_humanitarian_collections_api.Models.Validators;
+using managing_humanitarian_collections_api.Models.Collection;
 
 namespace managing_humanitarian_collections_api
 {
@@ -73,12 +75,7 @@ namespace managing_humanitarian_collections_api
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-            services.AddScoped<IValidator<AddProductToCategoryDto>, AddProductToCategoryDtoValidator>();
-            services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
-            
-           
-
-            services.AddScoped<IProductCategoryService, ProductCategoryService>();
+            services.AddValidatorsFromAssemblyContaining<AddProductToCategoryDtoValidator>();
             //seeder bazy danych
             services.AddScoped<CollectionSeeder>();          
             services.AddScoped<ErrorHandlingMiddleware>();

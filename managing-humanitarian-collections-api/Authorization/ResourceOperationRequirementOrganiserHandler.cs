@@ -17,8 +17,9 @@ namespace managing_humanitarian_collections_api.Authorization
                     context.Succeed(requirement);
                 }
 
-                var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                if (collection.CreatedByOrganiserId == int.Parse(userId))
+            var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var userRole = context.User.FindFirst(c => c.Type == ClaimTypes.Role).Value;
+            if (collection.CreatedByOrganiserId == int.Parse(userId) || (userRole == "Admin" || userRole == "Organizator"))
                 {
                     context.Succeed(requirement);
                 }

@@ -57,12 +57,33 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Avatar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Avatars");
+                });
+
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Collection", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
+
+                    b.Property<int>("CollectionStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreateDate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
@@ -73,16 +94,15 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RegistrationNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
+                    b.Property<string>("RegistrationNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CollectionStatusId");
 
                     b.HasIndex("CreatedById");
 
@@ -143,6 +163,21 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.ToTable("CollectionProducts");
                 });
 
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.CollectionStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CollectionStatuses");
+                });
+
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -158,6 +193,9 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
+
+                    b.Property<string>("CreatedCommentDate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -176,15 +214,22 @@ namespace managing_humanitarian_collections_api.Migrations
                     b.Property<int>("CollectionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CreatedByDonatorId")
+                    b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<string>("DeliveryStatus")
+                    b.Property<string>("CreatedOrderDate")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderStatusId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CollectionId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("OrderStatusId");
 
                     b.ToTable("Orders");
                 });
@@ -209,7 +254,24 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.HasIndex("OrderId");
 
+                    b.HasIndex("ProductId");
+
                     b.ToTable("OrderProducts");
+                });
+
+            modelBuilder.Entity("managing_humanitarian_collections_api.Entities.OrderStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderStatuses");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
@@ -254,20 +316,14 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("Height")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<string>("Size")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Weight")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Width")
-                        .HasColumnType("int");
+                    b.Property<string>("Weight")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -284,8 +340,8 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("Avatar")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("AvatarId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(max)");
@@ -310,6 +366,8 @@ namespace managing_humanitarian_collections_api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AvatarId");
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
@@ -324,7 +382,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -340,7 +397,6 @@ namespace managing_humanitarian_collections_api.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HashPassword")
@@ -390,9 +446,17 @@ namespace managing_humanitarian_collections_api.Migrations
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Collection", b =>
                 {
+                    b.HasOne("managing_humanitarian_collections_api.Entities.CollectionStatus", "CollectionStatus")
+                        .WithMany()
+                        .HasForeignKey("CollectionStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("managing_humanitarian_collections_api.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.Navigation("CollectionStatus");
 
                     b.Navigation("CreatedBy");
                 });
@@ -439,6 +503,20 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("managing_humanitarian_collections_api.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("managing_humanitarian_collections_api.Entities.OrderStatus", "OrderStatus")
+                        .WithMany()
+                        .HasForeignKey("OrderStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("OrderStatus");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.OrderProduct", b =>
@@ -448,6 +526,14 @@ namespace managing_humanitarian_collections_api.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("managing_humanitarian_collections_api.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Product", b =>
@@ -472,11 +558,17 @@ namespace managing_humanitarian_collections_api.Migrations
 
             modelBuilder.Entity("managing_humanitarian_collections_api.Entities.Profile", b =>
                 {
+                    b.HasOne("managing_humanitarian_collections_api.Entities.Avatar", "Avatar")
+                        .WithMany()
+                        .HasForeignKey("AvatarId");
+
                     b.HasOne("managing_humanitarian_collections_api.Entities.User", "User")
                         .WithOne("Profile")
                         .HasForeignKey("managing_humanitarian_collections_api.Entities.Profile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Avatar");
 
                     b.Navigation("User");
                 });

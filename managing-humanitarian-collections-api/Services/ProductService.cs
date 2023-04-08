@@ -3,6 +3,8 @@ using managing_humanitarian_collections_api.Entities;
 using managing_humanitarian_collections_api.Exceptions;
 using managing_humanitarian_collections_api.Models;
 using managing_humanitarian_collections_api.Models.Collection;
+using managing_humanitarian_collections_api.Models.Product;
+using managing_humanitarian_collections_api.Models.Products;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -17,7 +19,8 @@ namespace managing_humanitarian_collections_api.Services
 
         List<CategeriesDto> GetAllCategories();
 
-        ProductWithPropertiesDto GetProductWithProperties(int id);
+        void DeleteProduct(int id);
+        ProductPropertiesDto GetProductWithProperties(int id);
 
         int AddProductsToCategory(int categoryId, AddProductToCategoryDto dto);
         public List<ProductDto> GetAllProducts(string search);
@@ -41,6 +44,7 @@ namespace managing_humanitarian_collections_api.Services
                 .ProductCategories
                 .ToList();
 
+            if (categories == null) throw new NotFoundException("Nie znaleziono zbiórek");
             var collectionProductsDtos = _mapper.Map<List<CategeriesDto>>(categories);
 
             return collectionProductsDtos;
@@ -51,43 +55,52 @@ namespace managing_humanitarian_collections_api.Services
             var products = _dbContext
                 .ProductCategories
                 .Include(c => c.Products)
+                .ThenInclude(x => x.Properties)
                 .FirstOrDefault(r => r.Id == id);
-
+            if (products == null) throw new NotFoundException("Brak przedmiotów dla tej kategorii");
             var productsByCategoryDtos = _mapper.Map<CategoryProductsDto>(products);
 
             return productsByCategoryDtos;
         }
 
-        public ProductWithPropertiesDto GetProductWithProperties(int id)
+        public ProductPropertiesDto GetProductWithProperties(int id)
         {
             var product = _dbContext
                 .Products
                 .Include(c => c.Properties)
                 .FirstOrDefault(p => p.Id == id);
 
-            var productDtos = _mapper.Map<ProductWithPropertiesDto>(product);
-
+            var productDtos = _mapper.Map<ProductPropertiesDto>(product);
             return productDtos;
+        }
+        public void DeleteProduct(int id)
+        {
+            var product = _dbContext
+                .Products
+                .FirstOrDefault(c => c.Id == id);
+
+            if (product is null)
+                throw new NotFoundException("Nie znaleziono przedmiotu");
+
+            _dbContext.Products.Remove(product);
+            _dbContext.SaveChanges();
 
         }
-
         public int AddProductsToCategory(int categoryId, AddProductToCategoryDto dto)
         {
-
-
             var product = _mapper.Map<Product>(dto);
              product.ProductCategoryId = categoryId;
 
-            //var products = _dbContext
-            //    .Products
-            //    .Where(r => r.ProductCategoryId == categoryId)
-            //    .ToList();
+            var products = _dbContext
+                .Products
+                .Where(r => r.ProductCategoryId == categoryId)
+                .ToList();
 
-            //foreach(var productItem in products)
-            //if(productItem.Name.ToLower().Contains(dto.Name.ToLower()))
-            //    throw new BadRequestException("Product już istnieje");
+            foreach (var productItem in products)
+                if (productItem.Name.ToLower().Contains(dto.Name.ToLower()))
+                    throw new BadRequestException("Przedmiot już istnieje");
+            
 
-           
             _dbContext.Products.Add(product);
             _dbContext.SaveChanges();
 
@@ -99,8 +112,10 @@ namespace managing_humanitarian_collections_api.Services
             var products = _dbContext
                 .Products
                 .Include(r => r.Category)
+                .Include(r => r.Properties)
                 .Where(r => search == null || (r.Name.ToLower().Contains(search.ToLower())))
                 .ToList();
+            if (products == null) throw new NotFoundException("Nie znaleziono przedmiotów");
 
             var productDtos = _mapper.Map<List<ProductDto>>(products);
 
@@ -112,9 +127,11 @@ namespace managing_humanitarian_collections_api.Services
             var products = _dbContext
                 .Products
                 .Include(r => r.Category)
+                .Include(r =>r.Properties)
                 .Where(r => r.ProductCategoryId == id)
                 .Where(r => search == null || (r.Name.ToLower().Contains(search.ToLower())))
                 .ToList();
+            if (products == null) throw new NotFoundException("Nie znaleziono przedmiotów");
 
             var productDtos = _mapper.Map<List<ProductDto>>(products);
 
