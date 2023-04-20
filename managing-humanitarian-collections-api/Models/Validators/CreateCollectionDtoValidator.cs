@@ -24,9 +24,9 @@ namespace managing_humanitarian_collections_api.Models.Validators
                 .NotEmpty()
                 .MinimumLength(50)
                 .MaximumLength(1500);
-            RuleFor(x => x.CollectionStatusId)
-                .NotEmpty()
-                .ExclusiveBetween(0,3);
+            //RuleFor(x => x.CollectionStatusId)
+            //    .NotEmpty()
+            //    .ExclusiveBetween(0,3);
 
             RuleFor(x => x.RegistrationNumber)
                 .Custom((value, context) =>

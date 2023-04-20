@@ -13,7 +13,7 @@ namespace managing_humanitarian_collections_api.Entities
         public string CreateDate { get; set; }
         public int? CreatedByOrganiserId { get; set; }
         public virtual List<Order> Orders { get; set; } 
-        public virtual User CreatedBy { get; set; }
+        public virtual User CreatedByOrganiser { get; set; }
         public virtual List<CollectionPoint> CollectionPoints { get; set; }
         public virtual List<CollectionProduct> CollectionProducts { get; set; }
         public virtual CollectionStatus CollectionStatus { get; set; }

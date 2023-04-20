@@ -26,9 +26,11 @@ namespace managing_humanitarian_collections_api.Common
               .ForMember(u => u.Nip, c => c.MapFrom(r => r.Profile.Nip))
               .ForMember(u => u.Regon, c => c.MapFrom(r => r.Profile.Regon))
               .ForMember(u => u.ContactNumber, c => c.MapFrom(r => r.Profile.ContactNumber))
+              .ForMember(u => u.Role, c => c.MapFrom(r =>r.Role.Name))
               .ForMember(u => u.Avatar, c => c.MapFrom(r => r.Profile.Avatar.Name));
             CreateMap<CollectionPoint, CollectionPointDto>()
                .ForMember(m => m.Voivodeship, c => c.MapFrom(s => s.Address.Voivodeship.Name))
+               .ForMember(m => m.VoivodeshipId, c => c.MapFrom(s => s.Address.VoivodeshipId))
                .ForMember(m => m.Street, c => c.MapFrom(s => s.Address.Street))
                .ForMember(m => m.City, c => c.MapFrom(s => s.Address.City))
                .ForMember(m => m.Postcode, c => c.MapFrom(s => s.Address.Postcode))
@@ -43,7 +45,7 @@ namespace managing_humanitarian_collections_api.Common
              .ForMember(o => o.Weight, c => c.MapFrom(s => s.Product.Properties.Weight));
             CreateMap<Collection, CollectionDto>()
                 .ForMember(m => m.Status, c => c.MapFrom(s => s.CollectionStatus.Status))
-                .ForMember(m => m.Name, c => c.MapFrom(s => s.CreatedBy.Profile.Name));
+                .ForMember(m => m.Name, c => c.MapFrom(s => s.CreatedByOrganiser.Profile.Name));
             CreateMap<CreateCollectionPointDto, CollectionPoint>()
                 .ForMember(p => p.Address, c => c.MapFrom(dto => new Address()
                 {

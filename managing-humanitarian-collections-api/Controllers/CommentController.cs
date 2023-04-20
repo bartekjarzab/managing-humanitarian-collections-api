@@ -37,7 +37,7 @@ namespace managing_humanitarian_collections_api.Controllers
             var commentsDto = _commentService.GetAllCollectionComments(collectionId);
             return Ok(commentsDto);
         }
-        [Authorize(Roles = "Admin, Organizator")]
+        [Authorize()]
         #endregion
         [HttpDelete("comments/{id}")]
         public ActionResult DeleteThisComment([FromRoute] int id)

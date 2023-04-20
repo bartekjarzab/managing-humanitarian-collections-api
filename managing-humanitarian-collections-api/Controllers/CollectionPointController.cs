@@ -44,7 +44,7 @@ namespace managing_humanitarian_collections_api.Controllers
         public ActionResult EditcollectionPoint([FromBody] CreateCollectionPointDto dto,[FromRoute] int collectionId, int collectionPointId)
         {
 
-            _collectionPointService.EditCollectionPoint(collectionId, collectionPointId, dto);
+            _collectionPointService.EditCollectionPoint(collectionPointId,collectionId, dto);
             return Ok("Profil został zedytowany");
         }
         [Authorize(Roles = "Organizator")]

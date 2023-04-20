@@ -2,6 +2,7 @@
 {
     public class UserProfileDto
     {
+        public int Id { get; set; }
         public string Email { get; set; }
 
         #region Darczyńca
@@ -18,6 +19,7 @@
         public string? Avatar { get; set; }
         #endregion
         public string ContactNumber { get; set; }
+        public string Role { get; set; }
 
     }
 }

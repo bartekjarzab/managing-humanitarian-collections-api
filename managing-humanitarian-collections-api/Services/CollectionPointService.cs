@@ -54,11 +54,11 @@ namespace managing_humanitarian_collections_api.Services
         public CollectionPointDto GetById(int collectionId, int collectionPointId)
         {
             var collectionPoint = _dbContext.CollectionPoints
-                .Where(r => r.Id == collectionId)
+                .Where(r => r.CollectionId == collectionId)
                 .Include(r => r.Address)
                 .ThenInclude(a => a.Voivodeship)
                 .FirstOrDefault(d => d.Id == collectionPointId);
-            if (collectionPoint == null || collectionPoint.CollectionId != collectionId) 
+            if (collectionPoint == null ) 
                 throw new NotFoundException("nie znaleziono punktu");
             
             var collectionPointDto = _mapper.Map<CollectionPointDto>(collectionPoint);

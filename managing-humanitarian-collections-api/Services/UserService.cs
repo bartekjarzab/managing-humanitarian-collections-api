@@ -74,6 +74,7 @@ namespace managing_humanitarian_collections_api.Services
         {
             var profile = _dbContext
                 .Users
+                .Include(r => r.Role)
                 .Include(r => r.Profile)
                 .ThenInclude(r=> r.Avatar)
                 .FirstOrDefault(r => r.Id == id);

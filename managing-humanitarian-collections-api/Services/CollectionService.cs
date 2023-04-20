@@ -25,7 +25,10 @@ namespace managing_humanitarian_collections_api.Services
         List<CollectionDto> GetAllCollections();
         CollectionDto GetCollection(int id);
         IEnumerable<CollectionDto> GetCollectionPerOrganiser(int id);
-        void EditCollection(int collectionId, CreateCollectionDto dto);
+        void EditCollection(int collectionId, EditCollectionDto dto);
+        void DeleteCollectionproduct(int id, int collectionId);
+        void EditCollectionProduct(int collectionProductId, int collectionId, CreateCollectionProductDto dto);
+        CollectionProductsListDto GetCollectionProductById(int collectionId, int collectionProductId);
 
     }
 
@@ -64,8 +67,9 @@ namespace managing_humanitarian_collections_api.Services
         {
             var collections = _dbContext
                 .Collections
+                .Include(r => r.CreatedByOrganiser)
+                .ThenInclude(r => r.Profile)
                 .Include(r => r.CollectionStatus)
-                .Include(r => r.CreatedBy.Profile)
                 .OrderByDescending(x => x.CollectionStatus)
                 .OrderByDescending(x => x.Id)
                 .ToList();
@@ -99,7 +103,7 @@ namespace managing_humanitarian_collections_api.Services
         {
             var collection = _dbContext
                 .Collections
-                .Include(r => r.CreatedBy)
+                .Include(r => r.CreatedByOrganiser)
                 .ThenInclude(r => r.Role)
                 .FirstOrDefault(r => r.Id == id);
 
@@ -209,6 +213,8 @@ namespace managing_humanitarian_collections_api.Services
                 .Collections
                 .Include(x =>x.CollectionStatus)
                 .Where(r => r.CreatedByOrganiserId == id)
+                .OrderByDescending(x => x.CollectionStatus)
+                .ThenByDescending(x => x.CreateDate)
                 .ToList();
 
             if (collection is null) throw new NotFoundException("Nie znaleziono zbiórek");
@@ -218,7 +224,7 @@ namespace managing_humanitarian_collections_api.Services
             return collectionDtos;
         }
 
-        public void EditCollection(int collectionId, CreateCollectionDto dto)
+        public void EditCollection(int collectionId, EditCollectionDto dto)
         {
             var collection = _dbContext
                 .Collections
@@ -254,5 +260,56 @@ namespace managing_humanitarian_collections_api.Services
             _dbContext.SaveChanges();
         }
 
+        public void DeleteCollectionproduct(int id, int collectionId)
+        {
+
+            var collectionProduct = _dbContext
+                .CollectionProducts
+                .Where(a => a.CollectionId == collectionId)
+                .FirstOrDefault(r => r.Id == id);
+
+            if (collectionProduct is null)
+                throw new NotFoundException("Nie znaleziono produktu");
+
+            _dbContext.CollectionProducts.Remove(collectionProduct);
+            _dbContext.SaveChanges();
+
+        }
+        public void EditCollectionProduct(int collectionProductId, int collectionId, CreateCollectionProductDto dto)
+        {
+            var collectionProduct = _dbContext
+                .CollectionProducts
+                .Where(r => r.CollectionId == collectionId)
+                .FirstOrDefault(x => x.Id == collectionProductId);
+
+            if (collectionProduct == null)
+                throw new NotFoundException("nie znaleziono przedmiotu");
+
+
+
+            if (dto.Quantily != null)
+            {
+                collectionProduct.Quantily = dto.Quantily;
+            }
+            if (dto.ShortDescription != null)
+            {
+                collectionProduct.ShortDescription = dto.ShortDescription;
+            }
+    
+            _dbContext.SaveChanges();
+        }
+        public CollectionProductsListDto GetCollectionProductById(int collectionId, int collectionProductId)
+        {
+            var collectionProduct = _dbContext.CollectionProducts
+                 .Include(x => x.Product)
+                .Where(r => r.CollectionId == collectionId)
+               
+                .FirstOrDefault(d => d.Id == collectionProductId);
+            if (collectionProduct == null)
+                throw new NotFoundException("nie znaleziono punktu");
+
+            var collectionProductDto = _mapper.Map<CollectionProductsListDto>(collectionProduct);
+            return collectionProductDto;
+        }
     }
 }

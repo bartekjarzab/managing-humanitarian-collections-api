@@ -73,6 +73,7 @@ namespace managing_humanitarian_collections_api.Services
                 .Include(r => r.CreatedBy)
                 .ThenInclude(r => r.Profile)
                 .Where(r => r.CollectionId == collectionId)
+                .OrderByDescending(x => x.Id)
                 .ToList();
 
             if (comments is null) throw new NotFoundException("Nie znaleziono komentarzy");

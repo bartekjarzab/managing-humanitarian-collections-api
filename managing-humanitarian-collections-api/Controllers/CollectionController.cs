@@ -79,11 +79,32 @@ namespace managing_humanitarian_collections_api.Controllers
         }
         [Authorize(Roles = "Admin, Organizator")]
         [HttpPut("{collectionId}")]
-        public ActionResult EditCollection([FromBody] CreateCollectionDto dto, int collectionId)
+        public ActionResult EditCollection([FromBody] EditCollectionDto dto, int collectionId)
         {
 
             _collectionService.EditCollection(collectionId, dto);
             return Ok("Profil został zedytowany");
+        }
+
+        [HttpDelete("{collectionId}/collectionProduct/{collectionProductId}")]
+        public ActionResult DeleteCollectionProduct([FromRoute] int collectionProductId, int collectionId)
+        {
+            _collectionService.DeleteCollectionproduct(collectionProductId, collectionId);
+
+            return Ok("Przedmiot usunięty");
+        }
+        [HttpPut("{collectionId}/collectionProduct/{collectionProductId}")]
+        public ActionResult EditCollectionProduct([FromBody] CreateCollectionProductDto dto, [FromRoute] int collectionId, int collectionProductId)
+        {
+
+            _collectionService.EditCollectionProduct(collectionProductId, collectionId, dto);
+            return Ok("Przedmiot zbiórki zmieniono");
+        }
+        [HttpGet("{collectionId}/collectionProduct/{collectionProductId}")]
+        public ActionResult<CollectionProductsListDto> Get([FromRoute] int collectionId, [FromRoute] int collectionProductId)
+        {
+            CollectionProductsListDto collectionProduct = _collectionService.GetCollectionProductById(collectionId, collectionProductId);
+            return Ok(collectionProduct);
         }
     }
 }

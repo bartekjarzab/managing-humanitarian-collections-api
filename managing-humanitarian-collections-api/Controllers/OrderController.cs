@@ -78,7 +78,7 @@ namespace managing_humanitarian_collections_api.Controllers
             var orderProducts = _orderService.GetProductsPerOrder(orderId);
             return Ok(orderProducts);
         }
-        [HttpDelete("/order/{orderId}/orderProducts/{orderProductId}")]
+        [HttpDelete("order/{orderId}/orderProducts/{orderProductId}")]
         public ActionResult DeleteProductFromOrder([FromRoute] int orderId, int orderProductId)
         {
            _orderService.DeleteProductFromOrder(orderId, orderProductId);

@@ -12,6 +12,7 @@ namespace managing_humanitarian_collections_api.Models.Collection
         public string Status { get; set; }
         public string Name { get; set; }
         public int CreatedByOrganiserId { get; set; }
+        public int CollectionStatusId { get; set; }
 
     }
 }

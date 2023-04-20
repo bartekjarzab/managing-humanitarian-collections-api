@@ -87,13 +87,13 @@ namespace managing_humanitarian_collections_api.Services
                 .Where(p => p.OrderId == orderId)
                 .ToList();
 
-            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
-          new ResourceOperationRequirement(ResourceOperation.Create)).Result;
+          //  var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
+          //new ResourceOperationRequirement(ResourceOperation.Create)).Result;
 
-            if (!authorizationResult.Succeeded)
-            {
-                throw new ForbidException("Nie masz uprawnień do dodania przedmiotu");
-            }
+          //  if (!authorizationResult.Succeeded)
+          //  {
+          //      throw new ForbidException("Nie masz uprawnień do dodania przedmiotu");
+          //  }
 
             var orderProduct = _mapper.Map<OrderProduct>(dto);
             orderProduct.OrderId = orderId;
@@ -127,6 +127,7 @@ namespace managing_humanitarian_collections_api.Services
                 .Include(x => x.OrderProducts)
                 .FirstOrDefault(p => p.Id == orderId);
 
+
                 var collectionProducts = _dbContext
                 .CollectionProducts
                 .Where(x => x.CollectionId == orderProducts.CollectionId)
@@ -159,6 +160,8 @@ namespace managing_humanitarian_collections_api.Services
                 .ThenInclude(r => r.Profile)
                 .Include(r => r.OrderStatus)
                 .Where(r => r.CreatedById == id)
+                .OrderByDescending(x => x.OrderStatus)
+                .ThenByDescending(x => x.CreatedOrderDate)
                 .ToList();
 
             if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
@@ -178,6 +181,8 @@ namespace managing_humanitarian_collections_api.Services
                 .ThenInclude(r => r.Profile)
                 .Include(r => r.OrderStatus)
                 .Where(r => r.CollectionId == id)
+                 .OrderByDescending(x => x.OrderStatus)
+                .ThenByDescending(x => x.CreatedOrderDate)
                 .ToList();
 
             if (orders is null) throw new NotFoundException("Nie znaleziono zamówienia");
@@ -194,7 +199,7 @@ namespace managing_humanitarian_collections_api.Services
         {
             var order = _dbContext.Orders
                 .Include(n => n.OrderProducts)
-               // .ThenInclude(n => n.Product)
+                .ThenInclude(n => n.Product)
                 .FirstOrDefault(r => r.Id == id);
 
             if (order is null) throw new NotFoundException("Nie znaleziono zamówienia");
@@ -231,13 +236,13 @@ namespace managing_humanitarian_collections_api.Services
             if (order is null)
                 throw new NotFoundException("Nie znaleziono zamówienia");
 
-            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
-            new ResourceOperationRequirement(ResourceOperation.Update)).Result;
+            //var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
+            //new ResourceOperationRequirement(ResourceOperation.Update)).Result;
 
-            if (!authorizationResult.Succeeded)
-            {
-                throw new ForbidException("Brak uprawnień");
-            }
+            //if (!authorizationResult.Succeeded)
+            //{
+            //    throw new ForbidException("Brak uprawnień");
+            //}
 
             order.OrderStatusId = dto.OrderStatusId;
             order.CreatedOrderDate = DateTime.Now.ToString("dd/MM/yyyy, HH:mm");

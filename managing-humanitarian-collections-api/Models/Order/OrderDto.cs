@@ -12,5 +12,6 @@ namespace managing_humanitarian_collections_api.Models.Order
         public string CreatedOrderDate { get; set; }
         public string Status { get; set; }
 
+        public int CollectionId { get; set; }
     }
 }

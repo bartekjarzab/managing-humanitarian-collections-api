@@ -6,6 +6,7 @@
         public string Content { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public int CreatedById { get; set; }
         public string CreatedCommentDate { get; set; }
     }
 }

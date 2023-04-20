@@ -14,5 +14,6 @@ namespace managing_humanitarian_collections_api.Models.Collection
         public string Postcode { get; set; }
         public string HouseNumber { get; set; }
         public string Apartment { get; set; }
+        public int VoivodeshipId { get; set; }
     }
 }
