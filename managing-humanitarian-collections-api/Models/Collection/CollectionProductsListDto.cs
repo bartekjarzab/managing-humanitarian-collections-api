@@ -8,6 +8,6 @@
         public string ShortDescription { get; set; }
         public string ProductName { get; set; }
         public string? Size { get; set; }
-        public string? Weight { get; set; }
+   
     }
 }

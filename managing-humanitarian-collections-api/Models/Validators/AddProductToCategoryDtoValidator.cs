@@ -25,7 +25,7 @@ namespace managing_humanitarian_collections_api.Models.Validators
                     var productInCategory = dbContext.Products.Any(u => u.Name == dto.Name &&  u.Size == dto.Size);
                     if (productInCategory)
                     {
-                        context.AddFailure("Product", "Przedmiot już istnieje w tej kategorii");
+                        context.AddFailure("Error", "Przedmiot już istnieje w tej kategorii");
                     }
                 });
         }

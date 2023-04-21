@@ -40,6 +40,7 @@ namespace managing_humanitarian_collections_api.Common
             #region Mapowanie zbiórek
             CreateMap<CreateCollectionDto, Collection>();
             CreateMap<CollectionProduct, CollectionProductsListDto>()
+                .ForMember(o => o.Size, c => c.MapFrom(s => s.Product.Size))
                 .ForMember(o => o.ProductName, c => c.MapFrom(s => s.Product.Name));
             CreateMap<Collection, CollectionDto>()
                 .ForMember(m => m.Status, c => c.MapFrom(s => s.CollectionStatus.Status))

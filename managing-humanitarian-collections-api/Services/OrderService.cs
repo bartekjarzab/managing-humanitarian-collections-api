@@ -87,13 +87,13 @@ namespace managing_humanitarian_collections_api.Services
                 .Where(p => p.OrderId == orderId)
                 .ToList();
 
-          //  var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
-          //new ResourceOperationRequirement(ResourceOperation.Create)).Result;
+            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
+          new ResourceOperationRequirement(ResourceOperation.Create)).Result;
 
-          //  if (!authorizationResult.Succeeded)
-          //  {
-          //      throw new ForbidException("Nie masz uprawnień do dodania przedmiotu");
-          //  }
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException("Nie masz uprawnień do dodania przedmiotu");
+            }
 
             var orderProduct = _mapper.Map<OrderProduct>(dto);
             orderProduct.OrderId = orderId;

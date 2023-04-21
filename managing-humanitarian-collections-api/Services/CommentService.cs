@@ -52,7 +52,7 @@ namespace managing_humanitarian_collections_api.Services
 
         public void DeleteComment(int id)
         {
-            _logger.LogError($"Komentarz od id {id} został usunięty");
+           
 
             var comment = _dbContext
                 .Comments
@@ -61,6 +61,14 @@ namespace managing_humanitarian_collections_api.Services
             if (comment is null)
                 throw new NotFoundException("Nie znaleziono komentarz");
 
+            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, comment,
+             new ResourceOperationRequirement(ResourceOperation.Delete)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException("Nie masz uprawnień do edycji komentarza");
+            }
+            
             _dbContext.Comments.Remove(comment);
             _dbContext.SaveChanges();
 

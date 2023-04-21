@@ -62,7 +62,9 @@ namespace managing_humanitarian_collections_api
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey)),
                 };
             });
-            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementOrganiserHandler>();
+            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementOrganizerHandler>();
+            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementDonatorHandler>();
+            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementCommentHandler>();
             services.AddControllers().AddFluentValidation();
             services.AddAutoMapper(this.GetType().Assembly);
             services.AddDbContext<ManagingCollectionsDbContext>();

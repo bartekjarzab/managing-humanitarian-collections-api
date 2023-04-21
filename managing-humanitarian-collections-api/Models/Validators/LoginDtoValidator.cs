@@ -24,7 +24,7 @@ namespace managing_humanitarian_collections_api.Models.Validators
                     var emailInUse = dbContext.Users.Any(u => u.Email == value);
                     if (!emailInUse)
                     {
-                        context.AddFailure("Email", "Taki użytkownik nie istnieje");
+                        context.AddFailure("Error", "Taki użytkownik nie istnieje");
                     }
                 });
          

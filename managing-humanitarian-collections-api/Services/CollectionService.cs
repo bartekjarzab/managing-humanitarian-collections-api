@@ -285,8 +285,6 @@ namespace managing_humanitarian_collections_api.Services
             if (collectionProduct == null)
                 throw new NotFoundException("nie znaleziono przedmiotu");
 
-
-
             if (dto.Quantily != null)
             {
                 collectionProduct.Quantily = dto.Quantily;

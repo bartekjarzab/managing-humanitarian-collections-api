@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace managing_humanitarian_collections_api.Authorization
 {
-    public class ResourceOperationRequirementOrganiserHandler
+    public class ResourceOperationRequirementOrganizerHandler
        : AuthorizationHandler<ResourceOperationRequirement, Collection>
     {
             protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ResourceOperationRequirement requirement,
@@ -19,7 +19,7 @@ namespace managing_humanitarian_collections_api.Authorization
 
             var userId = context.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var userRole = context.User.FindFirst(c => c.Type == ClaimTypes.Role).Value;
-            if (collection.CreatedByOrganiserId == int.Parse(userId) || (userRole == "Admin" || userRole == "Organizator"))
+            if (collection.CreatedByOrganiserId == int.Parse(userId) || (userRole == "Admin" ))
                 {
                     context.Succeed(requirement);
                 }

@@ -6,9 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace managing_humanitarian_collections_api.Models.Validators
 {
-    public class CreateCollectionDtoValidator : AbstractValidator<CreateCollectionDto>
+    public class EditCollectionDtoValidator : AbstractValidator<EditCollectionDto>
     {
-        public CreateCollectionDtoValidator(ManagingCollectionsDbContext dbContext)
+        public EditCollectionDtoValidator(ManagingCollectionsDbContext dbContext)
         {
             RuleFor(x => x.RegistrationNumber)
             .NotEmpty()

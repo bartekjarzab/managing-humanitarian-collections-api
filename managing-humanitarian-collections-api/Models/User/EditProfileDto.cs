@@ -8,7 +8,7 @@
         public string LastName { get; set; }
         #endregion
         #region Organizator
-        public int? Nip { get; set; }
+        public long? Nip { get; set; }
         public int? Regon { get; set; }
         public string Name { get; set; }
         public int? AvatarId { get; set; }

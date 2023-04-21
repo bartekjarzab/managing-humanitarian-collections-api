@@ -9,6 +9,6 @@ namespace managing_humanitarian_collections_api.Models.Product
 
         public string ProductCategoryId { get; set; }
 
-        // public List<ProductPropertiesDto> ProductProperties { get; set; }
+    
     }
 }

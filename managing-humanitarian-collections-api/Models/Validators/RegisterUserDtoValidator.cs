@@ -27,7 +27,7 @@ namespace managing_humanitarian_collections_api.Models.Validators
                     var emailInUse = dbContext.Users.Any(u => u.Email == value);
                     if(emailInUse)
                     {
-                        context.AddFailure("Email", "Adres mailowy jest zajęty");
+                        context.AddFailure("Error", "Adres mailowy jest zajęty");
                     }    
                 });
         }
