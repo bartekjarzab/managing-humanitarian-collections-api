@@ -40,9 +40,7 @@ namespace managing_humanitarian_collections_api.Common
             #region Mapowanie zbiórek
             CreateMap<CreateCollectionDto, Collection>();
             CreateMap<CollectionProduct, CollectionProductsListDto>()
-                .ForMember(o => o.ProductName, c => c.MapFrom(s => s.Product.Name))
-                  .ForMember(o => o.Size, c => c.MapFrom(s => s.Product.Properties.Size))
-             .ForMember(o => o.Weight, c => c.MapFrom(s => s.Product.Properties.Weight));
+                .ForMember(o => o.ProductName, c => c.MapFrom(s => s.Product.Name));
             CreateMap<Collection, CollectionDto>()
                 .ForMember(m => m.Status, c => c.MapFrom(s => s.CollectionStatus.Status))
                 .ForMember(m => m.Name, c => c.MapFrom(s => s.CreatedByOrganiser.Profile.Name));
@@ -75,29 +73,19 @@ namespace managing_humanitarian_collections_api.Common
                
             #endregion
             #region Mapowanie przedmiotów
-            CreateMap<Product, CreateProductDto>()
-                 .ForMember(o => o.Size, c => c.MapFrom(s => s.Properties.Size))
-                 .ForMember(o => o.Weight, c => c.MapFrom(s => s.Properties.Weight));
-            CreateMap<Product, ProductPropertiesDto>()
-                 .ForMember(o => o.Size, c => c.MapFrom(s => s.Properties.Size))
-                 .ForMember(o => o.Weight, c => c.MapFrom(s => s.Properties.Weight));
+            CreateMap<Product, CreateProductDto>();
+            CreateMap<Product, ProductPropertiesDto>();
             CreateMap<CreateProductCategoryDto, ProductCategory>();
             CreateMap<CollectionProduct, CreateCollectionProductDto>();
             CreateMap<CreateCollectionProductDto, CollectionProduct>();
             CreateMap<CollectionProduct, CollectionWithProductsDto>();
             CreateMap<Product, ProductDto>()
-             .ForMember(o => o.Category, c => c.MapFrom(s => s.Category.Name))
-             .ForMember(o => o.Size, c => c.MapFrom(s => s.Properties.Size))
-             .ForMember(o => o.Weight, c => c.MapFrom(s => s.Properties.Weight));
+             .ForMember(o => o.Category, c => c.MapFrom(s => s.Category.Name));
                 CreateMap<Product, AddProductToCategoryDto>();
             CreateMap<ProductCategory, CategeriesDto>();
 
-            CreateMap<AddProductToCategoryDto, Product>()
-                .ForMember(x => x.Properties, c => c.MapFrom(dto => new ProductProperties()
-                {
-                    Size = dto.Size,
-                    Weight = dto.Weight
-                }));
+            CreateMap<AddProductToCategoryDto, Product>();
+               
             #endregion
             #region Mapowanie zamówień
             CreateMap<CreateOrderDto, Order>();

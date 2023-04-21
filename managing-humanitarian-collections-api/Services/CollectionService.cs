@@ -173,9 +173,9 @@ namespace managing_humanitarian_collections_api.Services
         {
             var collection = _dbContext
                 .Collections
-                .Include(a => a.CollectionProducts)
+                .Include(a => a.CollectionProducts.Where(cp => cp.Quantily > 0))
+
                 .ThenInclude(a => a.Product)
-                .ThenInclude(a => a.Properties)
                 .FirstOrDefault(r => r.Id == collectionId);
 
             var collectionProductsDtos = _mapper.Map<List<CollectionProductsListDto>>(collection.CollectionProducts);

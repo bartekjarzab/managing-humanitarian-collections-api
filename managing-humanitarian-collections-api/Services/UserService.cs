@@ -60,6 +60,7 @@ namespace managing_humanitarian_collections_api.Services
             var users = _dbContext
                 .Users
                 .Include(u => u.Role)
+                .Where(r => r.RoleId <= 2)
                 .ToList();
 
             if (users is null) throw new NotFoundException("Użytkownik nie znaleziony");

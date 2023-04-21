@@ -13,6 +13,5 @@
         public string HouseNumber { get; set; }
         public string Apartment { get; set; }
 
-        // public int CollectionId { get; set; }
     }
 }

@@ -16,23 +16,16 @@ namespace managing_humanitarian_collections_api.Models.Validators
                 .MaximumLength(40);
 
             RuleFor(x => x.Size)
-                .NotEmpty()
-                .MinimumLength(3)
-                .MaximumLength(40);
-
-            RuleFor(x => x.Weight)
-                .NotEmpty()
-                .MinimumLength(3)
                 .MaximumLength(40);
 
 
-            RuleFor(x => x.Name)
-                .Custom((value, context) =>
+            RuleFor(x => x)
+                .Custom((dto, context) =>
                 {
-                    var productInCategory = dbContext.Products.Any(u => u.Name == value);
+                    var productInCategory = dbContext.Products.Any(u => u.Name == dto.Name &&  u.Size == dto.Size);
                     if (productInCategory)
                     {
-                        context.AddFailure("Product", "przedmiot już istnieje w tej kategorii");
+                        context.AddFailure("Product", "Przedmiot już istnieje w tej kategorii");
                     }
                 });
         }

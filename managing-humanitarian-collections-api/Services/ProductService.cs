@@ -55,7 +55,6 @@ namespace managing_humanitarian_collections_api.Services
             var products = _dbContext
                 .ProductCategories
                 .Include(c => c.Products)
-                .ThenInclude(x => x.Properties)
                 .FirstOrDefault(r => r.Id == id);
             if (products == null) throw new NotFoundException("Brak przedmiotów dla tej kategorii");
             var productsByCategoryDtos = _mapper.Map<CategoryProductsDto>(products);
@@ -67,7 +66,6 @@ namespace managing_humanitarian_collections_api.Services
         {
             var product = _dbContext
                 .Products
-                .Include(c => c.Properties)
                 .FirstOrDefault(p => p.Id == id);
 
             var productDtos = _mapper.Map<ProductPropertiesDto>(product);
@@ -112,7 +110,6 @@ namespace managing_humanitarian_collections_api.Services
             var products = _dbContext
                 .Products
                 .Include(r => r.Category)
-                .Include(r => r.Properties)
                 .Where(r => search == null || (r.Name.ToLower().Contains(search.ToLower())))
                 .ToList();
             if (products == null) throw new NotFoundException("Nie znaleziono przedmiotów");
@@ -127,7 +124,6 @@ namespace managing_humanitarian_collections_api.Services
             var products = _dbContext
                 .Products
                 .Include(r => r.Category)
-                .Include(r =>r.Properties)
                 .Where(r => r.ProductCategoryId == id)
                 .Where(r => search == null || (r.Name.ToLower().Contains(search.ToLower())))
                 .ToList();

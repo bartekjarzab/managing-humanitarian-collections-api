@@ -213,7 +213,6 @@ namespace managing_humanitarian_collections_api.Services
             var orderProducts = _dbContext
                 .OrderProducts
                 .Include(r => r.Product)
-                .ThenInclude(r => r.Properties)
                 .Where(r => r.OrderId == id)
                 .ToList();
 

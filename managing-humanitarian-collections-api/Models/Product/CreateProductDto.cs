@@ -6,7 +6,7 @@ namespace managing_humanitarian_collections_api.Models.Product
     {
         public string Name { get; set; }
         public string? Size { get; set; }
-        public string? Weight { get; set; }
+
         public string ProductCategoryId { get; set; }
 
         // public List<ProductPropertiesDto> ProductProperties { get; set; }

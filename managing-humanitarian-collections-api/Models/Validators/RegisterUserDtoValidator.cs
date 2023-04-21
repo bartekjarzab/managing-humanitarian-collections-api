@@ -19,7 +19,7 @@ namespace managing_humanitarian_collections_api.Models.Validators
 
             RuleFor(x => x.RoleId)
                 .NotEmpty()
-                .ExclusiveBetween(0, 3);
+                .ExclusiveBetween(0, 4);
 
             RuleFor(x => x.Email)
                 .Custom((value, context) =>
